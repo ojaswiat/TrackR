@@ -8,9 +8,7 @@
                 {{ props.account.description }}
             </p>
         </template>
-        <div>
-            Provide category wise expenses here
-        </div>
+        <CategoryExpensesChart :categories="categories" />
     </UCard>
 </template>
 
@@ -20,5 +18,20 @@ const props = defineProps({
         type: Object as PropType<TAccount>,
         required: true,
     },
+});
+
+const accountId = computed(() => props.account.id);
+
+const { data: response, refresh: _refetch } = await useAsyncData(
+    () => `cat-exp-${accountId.value}`, // Dynamic key for caching
+    () => $fetch(CATEGORIES_EXPENSE_FETCH, {
+        method: "POST",
+        body: { account_id: accountId.value },
+    }),
+    { watch: [accountId] },
+);
+
+const categories = computed<TCategory[]>(() => {
+    return response.value?.data.categories ?? [];
 });
 </script>

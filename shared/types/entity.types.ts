@@ -12,9 +12,9 @@ export type TAccountList = TAccount[];
 
 export type TCategory = {
     id: string;
-    label: string;
+    name: string;
     description: string;
-    total_ammount?: number;
+    total_amount?: number;
     color: string;
     type: TCategoryType;
 };

@@ -2,17 +2,18 @@
     "name": "trackr",
     "type": "module",
     "private": true,
+    "packageManager": "pnpm@10.26.1",
     "scripts": {
         "build": "nuxt build",
-        "dev": "nuxt dev",
+        "dev": "nuxt dev --inspect",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
         "lint": "eslint .",
         "typecheck": "nuxt typecheck",
         "clean": "rm -rf .nuxt && rm -rf .output && rm -rf .data",
-        "clean:all": "bun clean && rm -rf node_modules && rm bun.lock",
-        "reset": "bun clean && bun prepare",
-        "reset:all": "bun clean:all && bun install"
+        "clean:all": "pnpm clean && rm -rf node_modules && rm pnpm-lock.yaml",
+        "reset": "pnpm clean && pnpm prepare",
+        "reset:all": "pnpm clean:all && pnpm install"
     },
     "dependencies": {
         "@iconify-json/lucide": "^1.2.82",
@@ -20,7 +21,8 @@
         "@nuxt/ui": "^4.3.0",
         "@vercel/analytics": "^1.6.1",
         "lodash-es": "^4.17.22",
-        "nuxt": "^4.2.2"
+        "nuxt": "^4.2.2",
+        "nuxt-charts": "^2.0.0"
     },
     "devDependencies": {
         "@antfu/eslint-config": "^6.7.3",

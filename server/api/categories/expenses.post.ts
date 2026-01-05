@@ -54,14 +54,16 @@ export default defineEventHandler(async (event) => {
         return accumulator;
     }, {} as Record<string, number>);
 
-    forEach(categories, (category) => {
-        category.total_ammount = categoryAmount[category.id];
+    const categoriesWithTotal = forEach(categories, (category) => {
+        category.total_amount = categoryAmount[category.id];
     });
 
     return {
         statusCode: SERVER_STATUS_CODES.OK,
         statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
         message: "Category expenses fetched successfully",
-        data: categories,
+        data: {
+            categories: categoriesWithTotal,
+        },
     };
 });
