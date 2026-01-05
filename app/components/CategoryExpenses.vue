@@ -2,10 +2,10 @@
     <UCard class="border border-primary rounded-3xl text-center">
         <template #header>
             <h5 class="text-xl font-bold text-primary w-xl">
-                {{ props.account.name }}
+                {{ selectedAccount?.name }}
             </h5>
-            <p v-if="props.account.description">
-                {{ props.account.description }}
+            <p v-if="selectedAccount?.description">
+                {{ selectedAccount.description }}
             </p>
         </template>
         <CategoryExpensesChart :categories="categories" />
@@ -14,21 +14,19 @@
 
 <script setup lang="ts">
 const props = defineProps({
-    account: {
+    selectedAccount: {
         type: Object as PropType<TAccount>,
         required: true,
     },
 });
 
-const accountId = computed(() => props.account.id);
-
 const { data: response, refresh: _refetch } = await useAsyncData(
-    () => `cat-exp-${accountId.value}`, // Dynamic key for caching
+    () => `cat-exp-${props.selectedAccount.id}`, // Dynamic key for caching
     () => $fetch(CATEGORIES_EXPENSE_FETCH, {
         method: "POST",
-        body: { account_id: accountId.value },
+        body: { account_id: props.selectedAccount.id },
     }),
-    { watch: [accountId] },
+    { watch: [props.selectedAccount] },
 );
 
 const categories = computed<TCategory[]>(() => {

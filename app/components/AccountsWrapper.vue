@@ -4,7 +4,10 @@
             :accounts="response?.data.accounts"
             @select-account="onAccountSelect"
         />
-        <AccountDetails :account="selectedAccount" />
+        <div class="flex flex-col gap-8">
+            <CategoryExpenses :selected-account="selectedAccount" />
+            <AccountSummary :accounts="accounts" />
+        </div>
     </div>
 </template>
 

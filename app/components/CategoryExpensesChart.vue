@@ -23,7 +23,7 @@ const props = defineProps({
 });
 
 const categoryExpenseChartData = computed(() => {
-    const amounts = map(props.categories, (category) => category.total_amount?.toFixed(2) ?? 0.00);
+    const amounts = map(props.categories, (category) => Number(category.total_amount?.toFixed(2)) ?? 0.00);
     return amounts;
 });
 
