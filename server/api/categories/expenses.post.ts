@@ -17,8 +17,11 @@ export default defineEventHandler(async (event) => {
             statusCode: SERVER_STATUS_CODES.BAD_REQUEST,
             statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.BAD_REQUEST],
             message: "Account ID required",
-            data: { field: "account_id" },
-        });
+            data: {
+                errors: { account_id: "required" },
+            },
+        },
+        );
     }
 
     const allAccounts = accountsData.accounts;
@@ -30,7 +33,9 @@ export default defineEventHandler(async (event) => {
             statusCode: SERVER_STATUS_CODES.NOT_FOUND,
             statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
             message: "Account not found",
-            data: { field: "account_id" },
+            data: {
+                errors: { account_id: "not found" },
+            },
         });
     }
 

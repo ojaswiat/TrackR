@@ -6,12 +6,12 @@ import categoriesData from "../../../data/category.json";
 import { CATEGORY_TYPE, SERVER_STATUS_CODES } from "../../../shared/constants/enums";
 
 export default defineEventHandler(() => {
-    const categories = filter(categoriesData.categories, (category) => category.type === CATEGORY_TYPE.EXPENSE);
-
     return {
         statusCode: SERVER_STATUS_CODES.OK,
         statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
         message: "Categories fetched successfully",
-        data: categories,
+        data: {
+            categories: categoriesData.categories,
+        },
     };
 });

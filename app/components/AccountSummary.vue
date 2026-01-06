@@ -1,5 +1,5 @@
 <template>
-    <UCard class="border border-primary rounded-3xl text-center">
+    <UCard>
         <template #header>
             <h5 class="text-xl font-bold text-primary w-xl">
                 Accounts Summary

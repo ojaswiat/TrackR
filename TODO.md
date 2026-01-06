@@ -1,8 +1,15 @@
-- Create the app with mock data.
+- Add transaction form.
 - Create the app header and footers.
 - Create login functionality.
 - Create tables - add functions, triggers, and RLS.
 - Add pagination to all the APIs.
+- All accounts are not possible for a DB.
+- Implement CRUD and refresh for applicable entities.
 - Add colors, themeing, etc.
 - Make the UI responsive
 - Add page titles using layout pageMeta
+
+- Pages: Landing, Privacy Policy, TOS
+- Header
+- Footer - Copyright, Made with love by Ojaswi Athghara
+- Enhance all pages with skeleton components

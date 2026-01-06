@@ -1,12 +1,16 @@
 <template>
-    <UCard class="border border-primary rounded-3xl text-center">
+    <UCard>
         <template #header>
-            <h5 class="text-xl font-bold text-primary w-xl">
-                {{ selectedAccount?.name }}
-            </h5>
-            <p v-if="selectedAccount?.description">
-                {{ selectedAccount.description }}
-            </p>
+            <div>
+                <h5 class="text-xl font-bold text-primary w-xl">
+                    {{ selectedAccount?.name }}
+                </h5>
+                <p
+                    v-if="selectedAccount?.description"
+                    class="text-wrap">
+                    {{ selectedAccount.description }}
+                </p>
+            </div>
         </template>
         <CategoryExpensesChart :categories="categories" />
     </UCard>

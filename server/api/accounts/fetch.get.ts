@@ -10,5 +10,6 @@ export default defineEventHandler(() => {
         data: {
             accounts: accountsData.accounts,
         },
+
     };
 });
