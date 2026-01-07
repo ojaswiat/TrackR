@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-wrap items-start gap-8 w-fit mx-auto flex-none h-full">
+    <div class="flex flex-wrap items-start gap-8 w-fit mx-auto flex-none h-full px-4">
         <AccountList
             class="flex-none h-[40%]"
             :accounts="accounts"
