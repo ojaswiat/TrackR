@@ -40,7 +40,11 @@ const { data: transactionsResponse, refresh: _refetch } = await useAsyncData(
     () => `transactions-${props.selectedAccount.id}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
         method: "POST",
-        body: { account_id: props.selectedAccount.id },
+        body: {
+            filters: {
+                account_id: props.selectedAccount.id === "acc_000" ? [] : [props.selectedAccount.id],
+            },
+        },
     }),
     { watch: [props.selectedAccount] },
 );

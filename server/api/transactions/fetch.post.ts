@@ -1,41 +1,46 @@
-import { filter, find, isEmpty, map, sortBy } from "lodash-es";
+import { filter, map, sortBy } from "lodash-es";
 import accountsData from "~~/data/account.json";
 import transactionData from "~~/data/transaction.json";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
-export default defineEventHandler(async (event) => {
-    const { account_id } = await readBody(event);
+type TRequestBody = {
+    filters?: {
+        account_id?: string[];
+    };
+};
 
-    // If there's no account id in the request
-    if (!account_id) {
-        throw createError({
-            statusCode: SERVER_STATUS_CODES.BAD_REQUEST,
-            statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.BAD_REQUEST],
-            message: "Account ID required",
-            data: {
-                errors: { account_id: "required" },
-            },
-        },
-        );
-    }
+export default defineEventHandler(async (event) => {
+    const body = (await readBody(event)) as TRequestBody;
+    const accountIds = body.filters?.account_id ?? [];
 
     const allAccounts = accountsData.accounts;
-    const account = find(allAccounts, (account) => account.id === account_id);
+    const allAccountIds = allAccounts.map((acc) => acc.id);
 
-    // Account with the given account ID is not found
-    if (isEmpty(account)) {
-        throw createError({
-            statusCode: SERVER_STATUS_CODES.NOT_FOUND,
-            statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
-            message: "Account not found",
-            data: {
-                errors: { account_id: "not found" },
-            },
-        });
+    // Determine which account IDs to process
+    // If empty array, process all accounts
+    const shouldProcessAllAccounts = accountIds.length === 0;
+    const targetAccountIds = shouldProcessAllAccounts ? allAccountIds : accountIds;
+
+    // Validate account IDs (if not processing all)
+    if (!shouldProcessAllAccounts) {
+        const invalidAccountIds = targetAccountIds.filter((id) => !allAccountIds.includes(id));
+        if (invalidAccountIds.length > 0) {
+            throw createError({
+                statusCode: SERVER_STATUS_CODES.NOT_FOUND,
+                statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
+                message: "One or more accounts not found",
+                data: {
+                    errors: { account_id: invalidAccountIds },
+                },
+            });
+        }
     }
 
-    const transactionsByAccount = filter(transactionData.transactions, (transaction) => transaction.account_id === account_id);
+    // Get transactions for the selected account(s)
+    const transactionsByAccount = filter(transactionData.transactions, (transaction) =>
+        targetAccountIds.includes(transaction.account_id));
+
     const dateTransactions = map(transactionsByAccount, (transaction) => {
         return {
             ...transaction,

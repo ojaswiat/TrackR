@@ -11,15 +11,13 @@
 
         <div
             v-if="!isEmpty(selectedAccount)"
-            :key="`${selectedAccount.id ?? 'no-account'}-summary`"
-            class="flex flex-col gap-8">
+            class="flex flex-col gap-4 justify-between">
             <CategoryExpenses :selected-account="selectedAccount" />
             <AccountSummary :accounts="accounts" />
         </div>
 
         <TransactionsRecent
             v-if="!isEmpty(selectedAccount)"
-            :key="`${selectedAccount.id ?? 'no-account'}-transactions`"
             class="flex-none"
             :selected-account="selectedAccount"
         />
