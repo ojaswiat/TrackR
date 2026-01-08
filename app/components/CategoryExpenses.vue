@@ -12,7 +12,13 @@
                 </p>
             </div>
         </template>
-        <CategoryExpensesChart :categories="categories" />
+        <div v-if="pending">
+            <USkeleton class="h-[240px] w-full" />
+        </div>
+        <CategoryExpensesChart
+            v-else
+            :categories="categories"
+        />
     </UCard>
 </template>
 
@@ -24,7 +30,7 @@ const props = defineProps({
     },
 });
 
-const { data: response, refresh: _refetch } = await useAsyncData(
+const { data: response, pending, refresh: _refetch } = await useAsyncData(
     () => `cat-exp-${props.selectedAccount.id}`, // Dynamic key for caching
     () => $fetch(CATEGORIES_EXPENSE_FETCH, {
         method: "POST",
@@ -34,7 +40,7 @@ const { data: response, refresh: _refetch } = await useAsyncData(
             },
         },
     }),
-    { watch: [props.selectedAccount] },
+    { watch: [() => props.selectedAccount.id] },
 );
 
 const categories = computed<TCategory[]>(() => {

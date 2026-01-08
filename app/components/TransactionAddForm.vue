@@ -106,14 +106,25 @@ import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import { z } from "zod";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
-import useAccountStore from "~/stores/AccountStore";
-import useCategoryStore from "~/stores/CategoryStore";
 
-const categoryStore = useCategoryStore();
-const accountStore = useAccountStore();
-
-const { categories } = storeToRefs(categoryStore);
-const { accounts } = storeToRefs(accountStore);
+const props = defineProps({
+    accounts: {
+        type: Object as PropType<TAccountList>,
+        required: true,
+    },
+    categories: {
+        type: Object as PropType<TCategoryList>,
+        required: true,
+    },
+    pendingAccounts: {
+        type: Boolean,
+        default: false,
+    },
+    pendingCategories: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const schema = z.object({
     date: z
@@ -181,7 +192,7 @@ const typeOptions = [
 ];
 
 const accountOptions = computed(() => {
-    return accounts.value.map((account) => ({
+    return props.accounts.map((account) => ({
         label: account.name,
         value: account.id,
     }));
@@ -189,7 +200,7 @@ const accountOptions = computed(() => {
 
 const categoryOptions = computed(() => {
     const selectedType = values.type;
-    return categories.value
+    return props.categories
         .filter((category: TCategory) => category.type === selectedType)
         .map((category: TCategory) => ({
             label: category.name,

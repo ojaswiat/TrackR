@@ -12,7 +12,17 @@
                 Showing transactions for {{ props.selectedAccount.name }}
             </p>
         </template>
-        <div class="flex flex-col gap-4 items-center w-fit p-4 overflow-y-auto flex-1">
+        <div
+            v-if="pending"
+            class="flex flex-col gap-4 items-center w-fit p-4 overflow-y-auto flex-1">
+            <USkeleton class="h-12 w-full" />
+            <USkeleton class="h-12 w-full" />
+            <USkeleton class="h-12 w-full" />
+            <USkeleton class="h-12 w-full" />
+        </div>
+        <div
+            v-else
+            class="flex flex-col gap-4 items-center w-fit p-4 overflow-y-auto flex-1">
             <UTable
                 :columns="columns"
                 :column-visibility="columnVisibility"
@@ -24,20 +34,31 @@
 
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
-import { map } from "lodash-es";
-import useCategoryStore from "~/stores/CategoryStore";
+import { map, reduce } from "lodash-es";
 
 const props = defineProps({
     selectedAccount: {
         type: Object as PropType<TAccount>,
         required: true,
     },
+    categories: {
+        type: Object as PropType<TCategoryList>,
+        required: true,
+    },
 });
 
-const categoryStore = useCategoryStore();
-const { categoriesMap } = storeToRefs(categoryStore);
+const categoriesMap = computed<Record<string, TCategory>>(() => {
+    return reduce(
+        props.categories,
+        (accumulator, category) => {
+            accumulator[category.id] = category;
+            return accumulator;
+        },
+        {} as Record<string, TCategory>,
+    );
+});
 
-const { data: transactionsResponse, refresh: _refetch } = await useAsyncData(
+const { data: transactionsResponse, pending, refresh: _refetch } = await useAsyncData(
     () => `transactions-${props.selectedAccount.id}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
         method: "POST",
@@ -47,7 +68,7 @@ const { data: transactionsResponse, refresh: _refetch } = await useAsyncData(
             },
         },
     }),
-    { watch: [props.selectedAccount] },
+    { watch: [() => props.selectedAccount.id] },
 );
 
 const transactions = computed(() => {
@@ -120,8 +141,4 @@ const columnVisibility = {
     type: false,
     category_color: false,
 };
-
-onMounted(async () => {
-    await categoryStore.fetchCategories();
-});
 </script>
