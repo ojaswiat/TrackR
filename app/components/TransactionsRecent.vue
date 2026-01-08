@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
 import { map, reduce } from "lodash-es";
+import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 const props = defineProps({
     selectedAccount: {
@@ -80,7 +81,7 @@ const columns: TableColumn<TTransactionUI>[] = [
     {
         accessorKey: "created_at",
         header: "Date",
-        cell: ({ row }) => formatDate(row.getValue("created_at")),
+        cell: ({ row }) => formatDate(row.getValue("created_at")).date,
     },
     {
         accessorKey: "category_name",
@@ -90,13 +91,15 @@ const columns: TableColumn<TTransactionUI>[] = [
             const categoryName: string = row.getValue("category_name");
 
             return h(
-                resolveComponent("UBadge"),
+                "span",
                 {
-                    class: "capitalize",
-                    variant: "subtle",
-                    color: categoryColor,
+                    class: `capitalize border py-[2px] px-1 rounded-sm text-sm`,
+                    style: {
+                        borderColor: categoryColor,
+                        color: categoryColor,
+                    },
                 },
-                () => categoryName,
+                categoryName,
             );
         },
     },
@@ -110,11 +113,18 @@ const columns: TableColumn<TTransactionUI>[] = [
             },
         },
         cell: ({ row }) => {
+            const transactionType = row.getValue("type");
             const amount = Number.parseFloat(row.getValue("amount"));
-            return new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "GBP",
-            }).format(amount);
+            return h(
+                "span",
+                {
+                    class: `font-semibold ${transactionType === TRANSACTION_TYPE.EXPENSE ? "text-red-500" : "text-primary"}`,
+                },
+                new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "GBP",
+                }).format(amount),
+            );
         },
     },
 

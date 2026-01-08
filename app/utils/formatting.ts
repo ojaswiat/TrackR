@@ -7,6 +7,9 @@ export function formatDate(isoString: string) {
     const hours = date.getHours() % 12 || 12;
     const minutes = date.getMinutes().toString().padStart(2, "0");
     const ampm = date.getHours() >= 12 ? "PM" : "AM";
-    
-    return `${day} ${month} ${year} at ${hours}:${minutes} ${ampm}`;
+
+    return {
+        date: `${day} ${month} ${year}`,
+        time: ` ${hours}:${minutes} ${ampm}`,
+    };
 }

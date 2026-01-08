@@ -1,5 +1,5 @@
 <template>
-    <div class="home px-4 h-[80vh]">
+    <div class="home px-4 h-full">
         <AccountList
             class="accounts-list"
             :accounts="accounts"
@@ -25,7 +25,7 @@
 
         <AccountSummary
             v-if="selectedAccount"
-            :accounts="accounts"
+            :accounts="summaryAccounts"
         />
     </div>
 </template>
@@ -37,6 +37,11 @@ const { data: accountsResponse, pending: pendingAccounts } = await useFetch(ACCO
 
 const accounts = computed<TAccountList>(() => {
     return (accountsResponse.value?.data.accounts ?? []) as TAccountList;
+});
+
+const summaryAccounts = computed<TAccountList>(() => {
+    return accounts.value.slice(1)
+    ;
 });
 
 const { data: categoriesResponse } = await useFetch(CATEGORIES_FETCH);
