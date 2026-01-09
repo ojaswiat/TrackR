@@ -1,10 +1,7 @@
-- Add transaction form.
-- Improve date pickers.
-- Create the app header and footers.
-- Create login functionality.
 - Create tables - add functions, triggers, and RLS.
 - Add pagination to all the APIs.
 - Add all accounts - the DB, APIs, and pagination will handle scaling issues.
+- Sum or transactions, grouped by categories will fetch you the categories and the total amount spent on each category.
 - Implement CRUD and refresh for applicable entities - accounts and categories.
 - Add colors, themeing, etc.
 - Make the UI responsive
