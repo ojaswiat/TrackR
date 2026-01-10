@@ -4,8 +4,8 @@
             <div
                 class="h-8 w-8 rounded-full flex items-center justify-center"
                 :class="{
-                    'bg-primary-100 text-primary-500': props.transaction.type === TRANSACTION_TYPE.INCOME,
-                    'bg-error-100 text-error-500': props.transaction.type === TRANSACTION_TYPE.EXPENSE,
+                    'bg-primary-100 dark:bg-primary-900/50 text-primary-500 dark:text-primary': props.transaction.type === TRANSACTION_TYPE.INCOME,
+                    'bg-error-100 dark:bg-error-900/50 text-error-500 dark:text-error': props.transaction.type === TRANSACTION_TYPE.EXPENSE,
                 }">
                 <UIcon
                     :name="`${props.transaction.type === TRANSACTION_TYPE.INCOME ? 'i-lucide:trending-up' : 'i-lucide:trending-down'}`"

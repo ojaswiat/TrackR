@@ -3,7 +3,7 @@
         <UCard class="w-60 bg-gradient-to-br from-primary-50 to-primary-400 hover:shadow-lg transition-shadow duration-300 ease-in-out">
             <div class="flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p>
+                    <p class="text-neutral-800">
                         Total Income
                     </p>
                     <div class="h-8 w-8 rounded-full bg-primary-100 text-primary-500 flex items-center justify-center">
@@ -13,7 +13,7 @@
                         />
                     </div>
                 </div>
-                <p class="text-2xl font-bold">
+                <p class="text-2xl font-bold text-neutral-800">
                     {{ currency }} {{ props.summary.total_income }}
                 </p>
             </div>
@@ -22,7 +22,7 @@
         <UCard class="w-60 bg-gradient-to-br from-error-50 to-error-400 hover:shadow-lg transition-shadow duration-300 ease-in-out">
             <div class="flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p>
+                    <p class="text-neutral-800">
                         Total Expense
                     </p>
                     <div class="h-8 w-8 rounded-full bg-error-100 text-error-500 flex items-center justify-center">
@@ -32,7 +32,7 @@
                         />
                     </div>
                 </div>
-                <p class="text-2xl font-bold">
+                <p class="text-2xl font-bold text-neutral-800">
                     {{ currency }} {{ props.summary.total_expense }}
                 </p>
             </div>
@@ -41,7 +41,7 @@
         <UCard class="w-60 bg-gradient-to-br from-info-50 to-info-400 hover:shadow-lg transition-shadow duration-300 ease-in-out">
             <div class="flex flex-col gap-1">
                 <div class="flex items-center justify-between">
-                    <p>
+                    <p class="text-neutral-800">
                         Net Balance
                     </p>
                     <div class="h-8 w-8 rounded-full bg-info-100 text-info-500 flex items-center justify-center">
@@ -51,7 +51,7 @@
                         />
                     </div>
                 </div>
-                <p class="text-2xl font-bold">
+                <p class="text-2xl font-bold text-neutral-800">
                     {{ currency }} {{ props.summary.total_income - props.summary.total_expense }}
                 </p>
             </div>

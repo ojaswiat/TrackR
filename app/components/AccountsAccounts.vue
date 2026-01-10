@@ -10,11 +10,11 @@
             as="button"
             class="accounts-card-hover add-card w-60 h-[136px] flex-shrink-0 cursor-pointer"
             :ui="{
-                root: 'border border-dashed border-muted hover:border-primary hover:bg-primary-50',
+                root: 'border border-dashed border-muted hover:border-primary hover:bg-primary-50 dark:hover:bg-primary-900/50',
             }"
             @click="emits('onAddAccount')">
             <div class="add-card-body flex flex-col gap-4 items-center text-muted">
-                <div class="add-icon-bg flex items-center w-12 h-12 justify-center rounded-full bg-gray-200">
+                <div class="add-icon-bg flex items-center w-12 h-12 justify-center rounded-full bg-neutral-200 dark:bg-neutral-800">
                     <UIcon
                         name="i-lucide:plus"
                         class="w-8 h-8"
@@ -47,7 +47,7 @@ const selectedAccount = defineModel<string>("selectedAccount");
     .add-card-body {
         color: var(--color-primary);
         .add-icon-bg {
-            background-color: white;
+            background-color: transparent;
         }
     }
 }

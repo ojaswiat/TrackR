@@ -4,7 +4,7 @@
             class="flex-shrink-0 w-64 pt-8 fixed top-0 left-0 z-9999"
             :open="true"
         />
-        <div class="p-8 w-full bg-neutral-50 pb-16">
+        <div class="p-8 w-full bg-neutral-50 dark:bg-neutral-900 pb-16">
             <UIPageHeader class="px-4 mb-4" />
             <slot></slot>
 
