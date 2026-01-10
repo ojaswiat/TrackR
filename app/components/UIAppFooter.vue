@@ -1,5 +1,5 @@
 <template>
-    <footer class="flex justify-center items-center gap-2 p-1 text-neutral-500 text-sm">
+    <footer class="p-1 text-neutral-500 text-sm fixed bottom-0 left-1/2 -translate-x-1/2">
         <p>
             trackr. &copy; {{ new Date().getFullYear() }}. Created by <NuxtLink
                 target="_blank"

@@ -12,36 +12,7 @@
                 placeholder="Select an account"
             />
 
-            <UPopover>
-                <UButton
-                    color="neutral"
-                    variant="outline"
-                    icon="i-lucide-calendar">
-                    <template v-if="selectedDateRange.start">
-                        <template v-if="selectedDateRange.end">
-                            {{ df.format(selectedDateRange.start.toDate(getLocalTimeZone())) }} - {{ df.format(selectedDateRange.end.toDate(getLocalTimeZone())) }}
-                        </template>
-
-                        <template v-else>
-                            {{ df.format(selectedDateRange.start.toDate(getLocalTimeZone())) }}
-                        </template>
-                    </template>
-                    <template v-else>
-                        Pick a date
-                    </template>
-                </UButton>
-
-                <template #content>
-                    <UCalendar
-                        v-model="selectedDateRange"
-                        class="p-2"
-                        :number-of-months="2"
-                        :min-value="minDate"
-                        :max-value="maxDate"
-                        range
-                    />
-                </template>
-            </UPopover>
+            <UIDateFilter v-model:selected-date-range="selectedDateRange" />
         </div>
     </div>
 </template>
@@ -57,10 +28,6 @@ const props = defineProps({
     },
 });
 
-const df = new DateFormatter("en-GB", {
-    dateStyle: "medium",
-});
-
 const selectedAccount = defineModel<string>("selectedAccount");
 const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("selectedDateRange", {
     default: {
@@ -69,11 +36,12 @@ const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("sel
     },
 });
 
-const minDate = today(getLocalTimeZone()).subtract({ years: 1 });
-const maxDate = today(getLocalTimeZone());
-
 const accountSelectOptions = computed(() => props.accounts.map((account) => ({
     label: account.name,
     value: account.id,
 })));
+
+const df = new DateFormatter("en-GB", {
+    dateStyle: "medium",
+});
 </script>

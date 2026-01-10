@@ -5,7 +5,7 @@
 <script setup lang="ts">
 definePageMeta({
     title: "Transactions",
-    description: "Manage your transactions here.",
+    description: "Manage your transactions here",
     layout: "new",
 });
 

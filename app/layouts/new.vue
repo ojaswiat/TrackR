@@ -7,9 +7,8 @@
         <div class="p-8 w-full bg-neutral-50">
             <UIPageHeader class="px-4 mb-4" />
             <slot></slot>
-            <div class="px-4 mt-4">
-                <UIAppFooter />
-            </div>
+
+            <UIAppFooter />
         </div>
     </div>
 </template>
@@ -21,3 +20,14 @@ useHead({
     },
 });
 </script>
+
+<style>
+.accounts-card-hover {
+    transform-origin: bottom center;
+    transform: scale(1);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.accounts-card-hover:hover {
+    transform: scale(1.03);
+}
+</style>
