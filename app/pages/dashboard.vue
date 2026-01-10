@@ -3,25 +3,28 @@
         <DashboardFilters
             v-model:selected-account="selectedAccount"
             v-model:selected-date-range="selectedDateRange"
+            class="px-4"
             :accounts="accounts"
         />
 
         <DashboardSummary
+            class="px-4"
             :summary="summary"
             :selected-date-range="selectedDateRange"
         />
         <DashboardAccounts
             v-model:selected-account="selectedAccount"
+            class="px-4"
             :accounts="accounts"
         />
 
-        <div class="grid grid-cols-2 gap-4">
-            <CategoryExpenses
-                :selected-account="selectedAccount"
-            />
-            <AccountSummary
-                :accounts="accounts.slice(1)"
-            />
+        <div class="grid grid-cols-2 gap-4 px-4">
+            <CategoryExpenses :selected-account="selectedAccount" />
+            <AccountSummary :accounts="accounts.slice(1)" />
+        </div>
+
+        <div class="px-4">
+            <TransactionRecentList :selected-account="selectedAccount" />
         </div>
     </div>
 </template>

@@ -64,7 +64,7 @@ const categoriesMap = computed<Record<string, TCategory>>(() => {
     );
 });
 
-const { data: transactionsResponse, refresh: _refetch } = await useAsyncData(
+const { data: transactionsResponse } = await useAsyncData(
     () => `transactions-${props.selectedAccount.id}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
         method: "POST",

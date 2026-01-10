@@ -57,7 +57,7 @@ const props = defineProps({
     },
 });
 
-const df = new DateFormatter("en-UK", {
+const df = new DateFormatter("en-GB", {
     dateStyle: "medium",
 });
 

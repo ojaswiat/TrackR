@@ -1,6 +1,6 @@
 <template>
-    <div class="w-screen">
-        <UIPageHeader />
+    <div class="w-screen p-16">
+        <UIPageHeader class="px-4" />
         <slot></slot>
     </div>
 </template>
