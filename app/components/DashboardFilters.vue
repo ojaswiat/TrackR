@@ -1,16 +1,22 @@
 <template>
     <div class="flex flex-wrap items-end justify-between gap-4 w-full">
-        <p class="text-sm font-semibold text-muted">
+        <p>
             Data between {{ df.format(selectedDateRange.start?.toDate(getLocalTimeZone())) }} - {{ df.format(selectedDateRange.end?.toDate(getLocalTimeZone())) }}
         </p>
 
         <div class="flex flex-wrap gap-4 items-center">
             <USelect
                 v-model="selectedAccount"
-                class="w-60"
+                class="w-xs"
                 :items="accountSelectOptions"
-                placeholder="Select an account"
-            />
+                placeholder="Select an account">
+                <template #item-leading="{ item }">
+                    <div
+                        class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                        :style="{ backgroundColor: item.color }">
+                    </div>
+                </template>
+            </USelect>
 
             <UIDateFilter v-model:selected-date-range="selectedDateRange" />
         </div>
@@ -39,6 +45,7 @@ const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("sel
 const accountSelectOptions = computed(() => props.accounts.map((account) => ({
     label: account.name,
     value: account.id,
+    color: account.color,
 })));
 
 const df = new DateFormatter("en-GB", {

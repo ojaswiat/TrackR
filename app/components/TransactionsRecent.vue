@@ -1,25 +1,25 @@
 <template>
-    <UCard
-        :ui="{
-            body: 'p-0 sm:p-0 h-full',
-        }">
-        <template #header>
-            <h5 class="text-xl text-primary font-bold">
-                Recent Transactions
+    <div>
+        <UCard>
+            <h5 class="text-xl font-bold">
+                All Transactions
             </h5>
             <p class="text-muted text-sm">
-                Showing transactions for {{ props.selectedAccount.name }}
+                Showing transactions for {{ accountsMap[props.selectedAccount || "acc_000"]?.name }}
             </p>
-        </template>
 
-        <div class="h-full pb-20 overflow-y-scroll">
-            <UTable
-                :columns="columns"
-                :column-visibility="columnVisibility"
-                :data="transactions"
-            />
-        </div>
-    </UCard>
+            <div class="h-[calc(100vh-28rem)] overflow-y-scroll mt-4">
+                <UTable
+                    :columns="columns"
+                    :column-visibility="columnVisibility"
+                    :data="transactions"
+                    :ui="{
+                        root: 'px-0',
+                    }"
+                />
+            </div>
+        </UCard>
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -29,33 +29,26 @@ import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 const props = defineProps({
     selectedAccount: {
-        type: Object as PropType<TAccount>,
+        type: String,
+        required: false,
+    },
+    selectedCategory: {
+        type: String,
+        required: false,
+    },
+    accounts: {
+        type: Array as PropType<TAccount[]>,
+        required: true,
+    },
+    categories: {
+        type: Array as PropType<TCategory[]>,
         required: true,
     },
 });
 
-// const { data: categoryResponse } = await useAsyncData(
-//     () => `categories-${props.selectedAccount.id}`, // Dynamic key for caching
-//     () => $fetch(CATEGORIES_FETCH, {
-//         method: "GET",
-//         body: {
-//             filters: {
-//                 account_id: props.selectedAccount.id === "acc_000" ? [] : [props.selectedAccount.id],
-//             },
-//         },
-//     }),
-//     { watch: [() => props.selectedAccount.id] },
-// );
-
-const { data: categoryResponse } = await useFetch(CATEGORIES_FETCH);
-
-const categories = computed(() => {
-    return (categoryResponse.value?.data?.categories || []) as TCategory[];
-});
-
 const categoriesMap = computed<Record<string, TCategory>>(() => {
     return reduce(
-        categories.value,
+        props.categories,
         (accumulator, category) => {
             accumulator[category.id] = category;
             return accumulator;
@@ -64,28 +57,42 @@ const categoriesMap = computed<Record<string, TCategory>>(() => {
     );
 });
 
+const accountsMap = computed<Record<string, TAccount>>(() => {
+    return reduce(
+        props.accounts,
+        (accumulator, account) => {
+            accumulator[account.id] = account;
+            return accumulator;
+        },
+        {} as Record<string, TAccount>,
+    );
+});
+
 const { data: transactionsResponse } = await useAsyncData(
-    () => `transactions-${props.selectedAccount.id}`, // Dynamic key for caching
+    () => `transactions-${props.selectedAccount}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
         method: "POST",
         body: {
             filters: {
-                account_id: props.selectedAccount.id === "acc_000" ? [] : [props.selectedAccount.id],
+                account_id: props.selectedAccount === "acc_000" ? [] : [props.selectedAccount],
             },
         },
     }),
-    { watch: [() => props.selectedAccount.id] },
+    { watch: [() => props.selectedAccount] },
 );
 
 const transactions = computed(() => {
     const transactionsWithoutCategory = transactionsResponse.value?.data.transactions;
     const transactionWithCategory = map(transactionsWithoutCategory, (transaction) => {
         const transactionCategory = categoriesMap.value[transaction.category_id];
+        const transactionAccount = accountsMap.value[transaction.account_id];
 
         return {
             ...transaction,
             category_name: transactionCategory?.name,
             category_color: transactionCategory?.color,
+            account_name: transactionAccount?.name,
+            account_color: transactionAccount?.color,
         };
     });
 
@@ -108,13 +115,30 @@ const columns: TableColumn<TTransactionUI>[] = [
             return h(
                 "span",
                 {
-                    class: `capitalize border py-[2px] px-1 rounded-sm text-sm`,
+                    class: `font-bold`,
                     style: {
-                        borderColor: categoryColor,
                         color: categoryColor,
                     },
                 },
                 categoryName,
+            );
+        },
+    },
+    {
+        accessorKey: "account_name",
+        header: "Account",
+        cell: ({ row }) => {
+            const accountColor: string = row.getValue("account_color");
+            const accountName: string = row.getValue("account_name");
+
+            return h(
+                "span",
+                {
+                    style: {
+                        color: accountColor,
+                    },
+                },
+                accountName,
             );
         },
     },
@@ -150,10 +174,14 @@ const columns: TableColumn<TTransactionUI>[] = [
     {
         accessorKey: "category_color",
     },
+    {
+        accessorKey: "account_color",
+    },
 ];
 
 const columnVisibility = {
     type: false,
     category_color: false,
+    account_color: false,
 };
 </script>

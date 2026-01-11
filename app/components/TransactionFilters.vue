@@ -1,0 +1,95 @@
+<template>
+    <div class="flex flex-wrap gap-4 items-end">
+        <p>Filter by</p>
+        <USelect
+            v-model="selectedType"
+            class="w-40 ml-auto"
+            :items="typeSelectOptions"
+            placeholder="Select a type"
+        />
+        <USelect
+            v-model="selectedCategory"
+            class="w-40"
+            :items="categorySelectOptions"
+            placeholder="Select a category">
+            <template #item-leading="{ item }">
+                <div
+                    class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                    :style="{ backgroundColor: item.color }">
+                </div>
+            </template>
+        </USelect>
+        <USelect
+            v-model="selectedAccount"
+            class="w-xs"
+            :items="accountSelectOptions"
+            placeholder="Select an account">
+            <template #item-leading="{ item }">
+                <div
+                    class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                    :style="{ backgroundColor: item.color }">
+                </div>
+            </template>
+        </USelect>
+
+        <UIDateFilter v-model:selected-date-range="selectedDateRange" />
+    </div>
+</template>
+
+<script setup lang="ts">
+import type { DateValue } from "@internationalized/date";
+import type { TTransactionType } from "~~/shared/constants/enums";
+import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
+import { map } from "lodash-es";
+import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
+
+const props = defineProps({
+    accounts: {
+        type: Object as PropType<TAccount[]>,
+        required: true,
+    },
+    categories: {
+        type: Object as PropType<TCategory[]>,
+        required: true,
+    },
+});
+
+const selectedType = defineModel<TTransactionType>("selectedType");
+const selectedAccount = defineModel<string>("selectedAccount");
+const selectedCategory = defineModel<string>("selectedCategory");
+const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("selectedDateRange", {
+    default: {
+        start: today(getLocalTimeZone()).subtract({ months: 1 }),
+        end: today(getLocalTimeZone()),
+    },
+});
+
+const accountSelectOptions = computed(() => map(props.accounts, (account) => ({
+    label: account.name,
+    value: account.id,
+    color: account.color,
+})));
+
+const categorySelectOptions = computed(() => map(props.categories, (category) => ({
+    label: category.name,
+    value: category.id,
+    color: category.color,
+})));
+
+const typeSelectOptions = ref([
+    {
+        label: "Expense",
+        value: TRANSACTION_TYPE.EXPENSE,
+        chip: {
+            color: "error" as const,
+        },
+    },
+    {
+        label: "Income",
+        value: TRANSACTION_TYPE.INCOME,
+        chip: {
+            color: "primary" as const,
+        },
+    },
+]);
+</script>

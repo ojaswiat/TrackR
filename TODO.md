@@ -1,5 +1,6 @@
 - Create tables - add functions, triggers, and RLS.
 - Add pagination to all the APIs.
+- Limit the date range that can be selected to one month.
 - Add Date range filter to all the APIs and use that to display the data on the dashboard.
 - Add all accounts - the DB, APIs, and pagination will handle scaling issues. Sum or transactions, grouped by categories will fetch you the categories and the total amount spent on each category.
 - Implement CRUD and refresh for applicable entities - accounts and categories.
