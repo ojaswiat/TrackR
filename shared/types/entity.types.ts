@@ -5,6 +5,7 @@ export type TAccount = {
     name: string;
     description?: string;
     color?: string;
+    initial_balance?: number;
 
     // TODO: get this from group by query on transaction from DB
     total_income?: number;

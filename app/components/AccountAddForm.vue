@@ -6,7 +6,8 @@
         <div class="flex flex-col gap-4">
             <UFormField
                 label="Account name"
-                name="name">
+                name="name"
+                required>
                 <UInput
                     v-model="state.name"
                     class="w-full"
@@ -27,7 +28,8 @@
 
             <UFormField
                 label="Choose a color"
-                name="color">
+                name="color"
+                required>
                 <USelect
                     v-model="state.color"
                     class="w-full"
@@ -50,11 +52,16 @@
 
             <UFormField
                 label="Initial balance"
-                name="initial_balance">
+                name="initial_balance"
+                required>
                 <UInput
                     v-model="state.initial_balance"
                     class="w-full"
+                    :disabled="!!props.account?.id"
                     type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
                 />
             </UFormField>
 
@@ -70,8 +77,8 @@
                 <UButton
                     type="submit"
                     color="primary"
-                    icon="i-lucide:plus">
-                    Add
+                    :icon="props.account?.id ? 'i-lucide:refresh-ccw' : 'i-lucide:plus'">
+                    {{ props.account?.id ? 'Update' : 'Add' }}
                 </UButton>
             </div>
         </div>
@@ -82,22 +89,16 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import z from "zod";
 
+const props = defineProps({
+    account: {
+        type: Object as PropType<TAccount>,
+        required: false,
+    },
+});
+
 const toast = useToast();
 
 const open = defineModel<boolean>("open");
-
-// const colorOptions = [
-//     { label: "Yellow", value: "#FFD93D" }, // Pastel Yellow
-//     { label: "Orange", value: "#FFA94D" }, // Pastel Orange
-//     { label: "Red", value: "#FF6B6B" }, // Pastel Red
-//     { label: "Green", value: "#6BCB77" }, // Pastel Green
-//     { label: "Teal", value: "#4D96FF" }, // Pastel Teal
-//     { label: "Blue", value: "#A8D8FF" }, // Pastel Blue
-//     { label: "Indigo", value: "#B197FC" }, // Pastel Indigo
-//     { label: "Purple", value: "#DA70D6" }, // Pastel Purple
-//     { label: "Pink", value: "#FF85C0" }, // Pastel Pink
-//     { label: "Cyan", value: "#76E4F7" }, // Pastel Cyan
-// ];
 
 const colorOptions = [
     { label: "Red", value: "#FF6F61" }, // Coral Red
@@ -123,16 +124,22 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const initialState = {
-    name: "",
-    initial_balance: 0,
-    color: "",
-    description: "",
+    name: props.account?.name || "",
+    initial_balance: props.account?.initial_balance || 0,
+    color: props.account?.color || "",
+    description: props.account?.description || "",
 };
 
 const state = ref(initialState);
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    toast.add({ title: "Success", description: "Account added successfully!", color: "success" });
+    if (props.account?.id) {
+        // Update account
+        toast.add({ title: "Success", description: "Account updated successfully!", color: "success" });
+    } else {
+        // Add account
+        toast.add({ title: "Success", description: "Account added successfully!", color: "success" });
+    }
     console.info(event.data);
     open.value = false;
 }

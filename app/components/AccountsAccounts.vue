@@ -1,11 +1,13 @@
 <template>
     <div class="w-full flex flex-wrap gap-8">
-        <AccountCard
-            v-for="account in props.accounts"
-            :key="`account-card-${account.id}`"
-            v-model:selected-account="selectedAccount"
-            :account="account"
-        />
+        <template v-if="!isEmpty(props.accounts)">
+            <AccountCard
+                v-for="account in props.accounts"
+                :key="`account-card-${account.id}`"
+                v-model:selected-account="selectedAccount"
+                :account="account"
+            />
+        </template>
         <UCard
             v-if="props.accounts.length < 5"
             as="button"
@@ -30,6 +32,8 @@
 </template>
 
 <script setup lang="ts">
+import { isEmpty } from "lodash-es";
+
 const props = defineProps({
     accounts: {
         type: Array as PropType<TAccount[]>,

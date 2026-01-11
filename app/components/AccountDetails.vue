@@ -5,7 +5,11 @@
                 <h5 class="text-2xl font-semibold">
                     {{ props.account?.name ?? 'Select an account' }}
                 </h5>
-                <AccountActions v-if="!isEmpty(props.account)" />
+                <AccountActions
+                    v-if="!isEmpty(props.account)"
+                    @on-edit-account="emits('onEditAccount', props.account)"
+                    @on-delete-account="emits('onDeleteAccount', props.account)"
+                />
             </div>
             <p class="text-muted">
                 {{ props.account?.description ?? 'Select an account to view its details and manage it' }}
@@ -19,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { isEmpty } from "@nuxt/ui/runtime/utils/index.js";
+import { isEmpty } from "lodash-es";
 
 const props = defineProps({
     account: {
@@ -31,4 +35,6 @@ const props = defineProps({
         required: true,
     },
 });
+
+const emits = defineEmits(["onEditAccount", "onDeleteAccount"]);
 </script>
