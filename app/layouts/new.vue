@@ -5,7 +5,7 @@
             :open="true"
             @on-add-transaction="showAddTransactionModal = true"
         />
-        <div class="pt-8 px-4 w-full bg-neutral-50 dark:bg-neutral-900 pb-16">
+        <div class="pt-8 px-4 w-full bg-neutral-100 dark:bg-neutral-900 pb-16">
             <UIPageHeader class="px-4 mb-4" />
             <slot></slot>
 
