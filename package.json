@@ -24,7 +24,6 @@
         "@nuxt/ui": "^4.3.0",
         "@nuxtjs/supabase": "2.0.3",
         "@pinia/nuxt": "^0.11.3",
-        "@vee-validate/zod": "^4.15.1",
         "@vercel/analytics": "^1.6.1",
         "drizzle-orm": "^0.45.1",
         "lodash-es": "^4.17.22",
@@ -32,7 +31,6 @@
         "nuxt-charts": "^2.0.0",
         "pinia": "^3.0.4",
         "postgres": "^3.4.8",
-        "vee-validate": "^4.15.1",
         "zod": "^4.3.5"
     },
     "devDependencies": {

@@ -1,17 +1,17 @@
 <template>
     <UForm
-        :state="values"
-        @submit.prevent="onSubmit">
+        :schema="schema"
+        :state="state"
+        @submit="onSubmit">
         <div class="flex flex-col gap-4">
             <div class="flex flex-wrap gap-4 justify-between items-center">
                 <UFormField
                     class="flex flex-col gap-1"
                     label="Type"
                     name="type"
-                    :error="errors.type"
                     required>
                     <URadioGroup
-                        v-model="typeField"
+                        v-model="state.type"
                         :items="transactionTypeOptions"
                         orientation="horizontal"
                     />
@@ -21,7 +21,6 @@
                     class="flex flex-col gap-1"
                     label="Date"
                     name="date"
-                    :error="errors.date"
                     required>
                     <UInputDate
                         ref="inputDate"
@@ -54,14 +53,11 @@
                 class="flex flex-col gap-1"
                 label="Account"
                 name="account"
-                :error="errors.account"
                 required>
                 <USelect
-                    v-model="accountField"
+                    v-model="state.account"
                     class="w-full"
                     :items="accountOptions"
-                    option-attribute="label"
-                    value-attribute="value"
                     placeholder="Select an account">
                     <template #item-leading="{ item }">
                         <div
@@ -76,16 +72,12 @@
                 class="flex flex-col gap-1"
                 label="Category"
                 name="category"
-                :disabled="typeField === TRANSACTION_TYPE.INCOME"
-                :error="errors.category"
                 required>
                 <USelect
-                    v-model="categoryField"
+                    v-model="state.category"
                     class="w-full"
                     :items="categoryOptions"
-                    option-attribute="label"
-                    value-attribute="value"
-                    :disabled="typeField === TRANSACTION_TYPE.INCOME"
+                    :disabled="state.type === TRANSACTION_TYPE.INCOME"
                     placeholder="Select a category">
                     <template #item-leading="{ item }">
                         <div
@@ -100,10 +92,9 @@
                 class="flex flex-col gap-1"
                 label="Amount"
                 name="amount"
-                :error="errors.amount"
                 required>
                 <UInput
-                    v-model="amountField"
+                    v-model="state.amount"
                     class="w-full"
                     type="number"
                     step="0.01"
@@ -114,15 +105,15 @@
 
             <UFormField
                 class="flex flex-col gap-1"
-                label="Note"
-                name="note"
-                :error="errors.note">
+                label="Description"
+                name="description"
+                required>
                 <UTextarea
-                    v-model="noteField"
+                    v-model="state.description"
                     class="w-full"
-                    :rows="3"
-                    placeholder="Optional note about this transaction"
-                    :maxlength="500"
+                    :rows="2"
+                    placeholder="Description about this transaction"
+                    :maxlength="60"
                 />
             </UFormField>
         </div>
@@ -155,16 +146,18 @@
 
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
-import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
-import { toTypedSchema } from "@vee-validate/zod";
+import type { FormSubmitEvent } from "@nuxt/ui";
+import type { TTransactionType } from "~~/shared/constants/enums";
+import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { map } from "lodash-es";
-import { useField, useForm } from "vee-validate";
 import { z } from "zod";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 // TODO: Get this from stores
 const { data: categoriesResponse } = await useFetch(CATEGORIES_FETCH);
 const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
+
+const toast = useToast();
 
 const categories = computed(() => {
     return categoriesResponse.value?.data?.categories || [];
@@ -194,21 +187,11 @@ const schema = z.object({
     account: z
         .string()
         .min(1, { message: "Account is required" }),
-    amount: z
-        .union([z.string(), z.number()])
-        .transform((val) => {
-            if (typeof val === "string") {
-                const num = Number.parseFloat(val);
-                return Number.isNaN(num) ? val : num;
-            }
-            return val;
-        })
-        .pipe(z.number({ message: "Amount must be a number" }).positive({ message: "Amount must be greater than 0" })),
-    note: z
+    amount: z.number().min(0.01, { message: "Amount must be greater than 0.00" }),
+    description: z
         .string()
-        .max(500, { message: "Note must be at most 500 characters" })
-        .optional()
-        .or(z.literal("")),
+        .min(1, { message: "Description is required" })
+        .max(60, { message: "Description must be at most 60 characters" }),
 }).refine((data) => {
     // Category required ONLY for expense (type === 1)
     if (data.type === TRANSACTION_TYPE.EXPENSE && !data.category?.trim()) {
@@ -219,51 +202,43 @@ const schema = z.object({
     message: "Category is required for expenses",
     path: ["category"], // Error shows on category field
 });
+type Schema = z.output<typeof schema>;
 
 const save = ref(false);
 const modalOpen = defineModel<boolean>("modalOpen", { default: false });
 
 const inputDate = useTemplateRef("inputDate");
-const validationSchema = toTypedSchema(schema);
 
-const initialValues = {
-    type: 1,
-    date: "",
+const initialState = {
+    type: 1 as TTransactionType,
+    date: today(getLocalTimeZone()).toString(),
     category: "",
     account: "",
-    amount: 0,
-    note: "",
+    amount: 0.00,
+    description: "",
 };
 
-const { handleSubmit, values, errors, resetForm, isSubmitting: _isSubmitting } = useForm({
-    validationSchema,
-    initialValues,
-});
-
-const { value: typeField } = useField<0 | 1>("type");
-const { value: dateField } = useField<string>("date");
-const { value: categoryField } = useField<string>("category");
-const { value: accountField } = useField<string>("account");
-const { value: amountField } = useField<number>("amount");
-const { value: noteField } = useField<string>("note");
+const state = ref(initialState);
 
 const dateProxy = computed({
     get: () => {
-        if (!dateField.value) {
-            return undefined;
-        }
-        try {
-            return parseDate(dateField.value);
-        } catch {
-            return undefined;
+        if (!state.value.date) {
+            return today(getLocalTimeZone());
+        } else {
+            const date = new Date(state.value.date);
+            return new CalendarDate(date.getFullYear(), date.getMonth(), date.getDate());
         }
     },
-    set: (value: DateValue | undefined) => {
+    set: (value: CalendarDate | undefined) => {
         if (!value) {
-            dateField.value = "";
+            const thisDay = today(getLocalTimeZone());
+            const thisDate = new Date(thisDay.toString());
+            state.value.date = thisDate.toISOString();
             return;
         }
-        dateField.value = value.toString();
+
+        const thisDate = new Date(value.toString());
+        state.value.date = thisDate.toISOString();
     },
 });
 
@@ -292,17 +267,13 @@ const categoryOptions = computed(() => {
     }).slice(1); // Remove the first option (Income Category)
 });
 
-function saveTransaction() {
-    console.info(typeField.value);
-    console.info(dateField.value);
-    console.info(categoryField.value);
-    console.info(accountField.value);
-    console.info(amountField.value);
-    console.info(noteField.value);
+function resetForm() {
+    state.value = initialState;
 }
 
-const onSubmit = handleSubmit(() => {
-    saveTransaction();
+async function onSubmit(event: FormSubmitEvent<Schema>) {
+    console.info(event.data);
+    toast.add({ title: "Success", description: "Transaction added successfully!", color: "success" });
     resetForm();
 
     if (!save.value) {
@@ -310,5 +281,5 @@ const onSubmit = handleSubmit(() => {
     }
 
     save.value = false;
-});
+};
 </script>
