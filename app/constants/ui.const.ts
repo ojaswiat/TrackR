@@ -2,7 +2,7 @@ export const PUBLIC_ROUTES = [
     ROUTE_INDEX,
     ROUTE_SIGNIN,
     ROUTE_ABOUT,
-    ROUTE_TOS,
+    ROUTE_TERMS,
     ROUTE_PRIVACY,
 ];
 

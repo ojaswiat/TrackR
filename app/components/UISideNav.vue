@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col gap-16 pb-4 h-screen sticky top-0 left-0 bg-white dark:bg-black">
+    <div class="flex flex-col gap-16 pb-4 h-screen sticky top-0 left-0 bg-white dark:bg-neutral-800">
         <div class="flex gap-4 items-start text-primary px-8">
             <UIcon
                 name="i-lucide:book-text"
@@ -25,7 +25,7 @@
                 :key="`route-${route}`"
                 class="cursor-pointer"
                 :class="{
-                    'text-white bg-primary dark:bg-primary-600 font-semibold': isRouteActive($route.path, route),
+                    'text-black bg-primary font-semibold': isRouteActive($route.path, route),
                     'text-neutral-600 dark:text-neutral-400 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-neutral-100 dark:hover:bg-neutral-700/50': !isRouteActive($route.path, route),
                 }"
                 :to="route">

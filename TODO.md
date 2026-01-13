@@ -19,6 +19,7 @@
     - Deploy to Vercel
     - Get a domain name and logo (Picsart)
     - [Need brand verification for google login](https://console.cloud.google.com/auth/branding?authuser=1&project=trackr-nuxt-app)
+    - Publish the app in Google Console
 
 Account transaction chart data
 
