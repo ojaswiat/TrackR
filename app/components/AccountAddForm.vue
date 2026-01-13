@@ -113,7 +113,7 @@ const colorOptions = [
     { label: "Yellow", value: "#FFE66D" }, // Light Yellow
     { label: "Mint", value: "#95E1D3" }, // Mint Green
     { label: "Teal", value: "#38ADA9" }, // Teal Green
-    { label: "Sky", value: "#2A9DF4" }, // Sky Blue
+    { label: "Sky", value: "#ABC6FE" }, // Sky Blue
     { label: "Blue", value: "#1E90FF" }, // Dodger Blue
     { label: "Violet", value: "#6C5CE7" }, // Soft Purple
     { label: "Purple", value: "#A29BFE" }, // Light Purple
