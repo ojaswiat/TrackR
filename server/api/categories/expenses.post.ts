@@ -5,7 +5,7 @@ import { filter, includes, reduce } from "lodash-es";
 import accountsData from "~~/data/account.json";
 import categoriesData from "~~/data/category.json";
 import transactionsData from "~~/data/transaction.json";
-import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api";
+import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api.const";
 import { CATEGORY_TYPE, SERVER_STATUS_CODES, TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 type TRequestBody = {

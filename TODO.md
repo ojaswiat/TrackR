@@ -1,6 +1,10 @@
 - Create database
     - Drizzle migrate
+    - Create table and categories
     - Add functions, triggers and RLS via Supabase SQL queries
+    - Triggers to add:
+        1. Users - create, update, delete.
+        2. Accounts - check and limit to 5.
 - Create back-end APIs
     - Add pagination to all the APIs.
     - Add Date range filter to all the APIs and use that to display the data on the dashboard.
@@ -25,7 +29,7 @@
     - [Need brand verification for google login](https://console.cloud.google.com/auth/branding?authuser=1&project=trackr-nuxt-app)
     - Publish the app in Google Console
 
-Further improvements - Add user profile image - Add custom categories
+Further improvements - Already have 10 categories. No more categories allowed. See your apple notes.
 
 Account transaction chart data
 
@@ -70,4 +74,23 @@ db
     transactions.transaction_type
   )
   .orderBy(sql`DATE(${transactions.transaction_date}) desc`)
+```
+
+Trigger to check number of accounts:
+
+```SQL
+CREATE OR REPLACE FUNCTION check_account_limit()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF (SELECT COUNT(*) FROM accounts WHERE user_id = NEW.user_id) >= 5 THEN
+    RAISE EXCEPTION 'User can only have 5 accounts';
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER account_limit_trigger
+BEFORE INSERT ON accounts
+FOR EACH ROW
+EXECUTE FUNCTION check_account_limit();
 ```

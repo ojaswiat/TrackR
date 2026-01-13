@@ -6,7 +6,6 @@ import {
     numeric,
     pgTable,
     timestamp,
-    uniqueIndex,
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
@@ -15,6 +14,8 @@ export const users = pgTable("users", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
     name: varchar({ length: 30 }).notNull(),
     email: varchar().notNull().unique(),
+
+    default_currency: varchar({ length: 3 }).notNull().default("GBP"),
 
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at")
@@ -25,6 +26,7 @@ export const users = pgTable("users", {
     index("email_idx").on(table.email),
 ]);
 
+// User can only have 5 accounts at max - add a trigger to check this
 export const accountsTable = pgTable("accounts", {
     id: uuid().primaryKey().default(sql`gen_random_uuid()`),
     name: varchar({ length: 30 }).notNull(),
@@ -43,7 +45,7 @@ export const accountsTable = pgTable("accounts", {
 export const categoriesTable = pgTable("categories", {
     id: uuid().primaryKey().default(sql`gen_random_uuid()`),
     name: varchar({ length: 30 }).notNull(),
-    user_id: uuid().references(() => users.id, { onDelete: "cascade" }).notNull(),
+
     description: varchar({ length: 60 }),
     type: integer().notNull(),
     color: varchar().notNull(),
@@ -54,7 +56,6 @@ export const categoriesTable = pgTable("categories", {
         .notNull()
         .$onUpdate(() => new Date()),
 }, (table) => [
-    index("user_id_idx").on(table.user_id),
     check(
         "type_valid", // constraint name
         sql`${table.type} IN (0, 1)`, // condition
