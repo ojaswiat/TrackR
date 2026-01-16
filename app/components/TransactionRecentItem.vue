@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex flex-wrap gap-4 justify-between items-center rounded-md p-4 hover:bg-muted">
+    <div class="w-full flex flex-wrap gap-4 p-4 justify-between items-center rounded-md hover:bg-neutral-400/10">
         <div class="flex gap-4 items-center">
             <div
                 class="h-12 w-12 rounded-full flex items-center justify-center"
