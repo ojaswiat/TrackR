@@ -26,7 +26,7 @@
             :modal="true"
             :dismissible="false"
             title="Edit Transaction"
-            description="Edit this transaction"
+            :description="`Edit this transaction ${selectedTransaction.amount}`"
             :close="{
                 color: 'neutral',
                 class: 'rounded-full',
@@ -220,7 +220,6 @@ const columns: TableColumn<TTransactionUI>[] = [
             },
         },
         cell: ({ row }) => {
-            selectedTransaction.value = row.original;
             return h(
                 UDropdownMenu,
                 {
@@ -285,10 +284,12 @@ function getRowItems(row: Row<TTransactionUI>) {
 }
 
 function onTransactionEdit(id: string) {
+    selectedTransaction.value = find(transactions.value, (transaction) => transaction.id === id);
     showEditTransactionModal.value = true;
 }
 
 function onTransactionDelete(id: string) {
+    selectedTransaction.value = find(transactions.value, (transaction) => transaction.id === id);
     showDeleteTransactionModal.value = true;
 }
 </script>

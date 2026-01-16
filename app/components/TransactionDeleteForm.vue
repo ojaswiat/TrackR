@@ -13,6 +13,7 @@
             <div class="w-full flex justify-end gap-4 mt-4">
                 <UButton
                     type="button"
+                    :disabled="deleting"
                     class="w-fit"
                     variant="ghost"
                     color="neutral"
@@ -21,6 +22,7 @@
                 </UButton>
                 <UButton
                     type="submit"
+                    :loading="deleting"
                     class="w-fit"
                     color="error">
                     Delete
@@ -39,11 +41,24 @@ const props = defineProps({
 });
 
 const toast = useToast();
+
 const open = defineModel<boolean>("open");
 
+const deleting = ref(false);
+
 async function onSubmit() {
-    toast.add({ title: "Success", description: "Account deleted successfully!", color: "success" });
-    console.info(props.transaction?.id);
-    open.value = false;
+    try {
+        deleting.value = true;
+        await sleep();
+
+        toast.add({ title: "Success", description: "Transaction deleted successfully!", color: "success" });
+        console.info(props.transaction?.id);
+        open.value = false;
+    } catch (error) {
+        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+        console.error(error);
+    } finally {
+        deleting.value = false;
+    }
 }
 </script>

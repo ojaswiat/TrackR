@@ -57,12 +57,7 @@ const props = defineProps({
 const selectedType = defineModel<TTransactionType>("selectedType");
 const selectedAccount = defineModel<string>("selectedAccount");
 const selectedCategory = defineModel<string>("selectedCategory");
-const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("selectedDateRange", {
-    default: {
-        start: today(getLocalTimeZone()).subtract({ months: 1 }),
-        end: today(getLocalTimeZone()),
-    },
-});
+const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("selectedDateRange");
 
 const accountSelectOptions = computed(() => map(props.accounts, (account) => ({
     label: account.name,

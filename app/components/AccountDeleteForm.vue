@@ -24,6 +24,7 @@
             <div class="w-full flex justify-end gap-4 mt-4">
                 <UButton
                     type="button"
+                    :disabled="deleting"
                     class="w-fit"
                     variant="ghost"
                     color="neutral"
@@ -32,6 +33,7 @@
                 </UButton>
                 <UButton
                     type="submit"
+                    :loading="deleting"
                     class="w-fit"
                     color="error">
                     Delete
@@ -56,6 +58,8 @@ const toast = useToast();
 
 const open = defineModel<boolean>("open");
 
+const deleting = ref(false);
+
 const schema = z.object({
     keep_transactions: z.boolean().default(true),
 });
@@ -68,8 +72,18 @@ const initialState = {
 const state = ref(initialState);
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    toast.add({ title: "Success", description: "Account deleted successfully!", color: "success" });
-    console.info(props.account?.id, event.data);
-    open.value = false;
+    try {
+        deleting.value = true;
+        await sleep();
+
+        toast.add({ title: "Success", description: "Account deleted successfully!", color: "success" });
+        console.info(props.account?.id, event.data);
+        open.value = false;
+    } catch (error) {
+        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+        console.error(error);
+    } finally {
+        deleting.value = false;
+    }
 }
 </script>

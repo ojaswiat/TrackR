@@ -75,6 +75,7 @@
             <div class="flex justify-end gap-4 mt-4">
                 <UButton
                     type="button"
+                    :disabled="adding"
                     color-options
                     color="neutral"
                     variant="ghost"
@@ -83,6 +84,7 @@
                 </UButton>
                 <UButton
                     type="submit"
+                    :loading="adding"
                     color="primary"
                     :icon="edit && props.account?.id ? 'i-lucide:refresh-ccw' : 'i-lucide:plus'">
                     {{ edit && props.account?.id ? 'Update' : 'Add' }}
@@ -107,6 +109,8 @@ const toast = useToast();
 
 const open = defineModel<boolean>("open", { default: false });
 const edit = defineModel<boolean>("edit", { default: false });
+
+const adding = ref(false);
 
 const colorOptions = [
     { label: "Red", value: "#FF6F61" }, // Coral Red
@@ -141,15 +145,25 @@ const initialState = {
 const state = ref(initialState);
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    if (edit.value && props.account?.id) {
+    try {
+        adding.value = true;
+        await sleep();
+
+        if (edit.value && props.account?.id) {
         // Update account
-        toast.add({ title: "Success", description: "Account updated successfully!", color: "success" });
-    } else {
+            toast.add({ title: "Success", description: "Account updated successfully!", color: "success" });
+        } else {
         // Add account
-        toast.add({ title: "Success", description: "Account added successfully!", color: "success" });
+            toast.add({ title: "Success", description: "Account added successfully!", color: "success" });
+        }
+        console.info(event.data);
+        edit.value = false;
+        open.value = false;
+    } catch (error) {
+        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+        console.error(error);
+    } finally {
+        adding.value = false;
     }
-    console.info(event.data);
-    edit.value = false;
-    open.value = false;
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <UForm
-        :key="uniqueFormKey"
+        ref="form"
         :schema="schema"
         :state="state"
         @submit="onSubmit">
@@ -126,6 +126,7 @@
         <div class="flex justify-end gap-4 mt-4">
             <UButton
                 type="button"
+                :disabled="saving"
                 color="neutral"
                 variant="ghost"
                 @click="open = false">
@@ -134,6 +135,8 @@
             <UButton
                 v-if="!props.transaction?.id"
                 type="submit"
+                :loading="saving && !save"
+                :disabled="saving && save"
                 color="primary"
                 variant="outline"
                 icon="i-lucide:plus">
@@ -141,6 +144,8 @@
             </UButton>
             <UButton
                 type="submit"
+                :loading="saving && save"
+                :disabled="saving && !save"
                 color="primary"
                 icon="i-lucide:file-check"
                 @click="save = true">
@@ -152,8 +157,8 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
-import { CalendarDate, DateFormatter, getLocalTimeZone, parseDate, today } from "@internationalized/date";
-import { map } from "lodash-es";
+import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
+import { cloneDeep, map } from "lodash-es";
 import { z } from "zod";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
@@ -167,8 +172,6 @@ const props = defineProps({
 // TODO: Get this from stores
 const { data: categoriesResponse } = await useFetch(CATEGORIES_FETCH);
 const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
-
-const toast = useToast();
 
 const categories = computed(() => {
     return categoriesResponse.value?.data?.categories || [];
@@ -215,9 +218,13 @@ const schema = z.object({
 });
 type Schema = z.output<typeof schema>;
 
+const toast = useToast();
+const form = useTemplateRef("form");
+
 const save = ref(false);
+const saving = ref(false);
+
 const open = defineModel<boolean>("open", { default: false });
-const uniqueFormKey = ref("");
 
 const inputDate = useTemplateRef("inputDate");
 
@@ -226,18 +233,18 @@ const initialState = {
     date: props.transaction?.created_at ?? today(getLocalTimeZone()).toString(),
     category: props.transaction?.category_id ?? "",
     account: props.transaction?.account_id ?? "",
-    amount: Number(props.transaction?.amount) ?? 0.00,
+    amount: props.transaction?.amount ?? 0.00,
     description: props.transaction?.description ?? "",
 };
 
-const state = ref(initialState);
+const state = reactive(cloneDeep(initialState));
 
 const dateProxy = computed({
     get: () => {
-        if (!state.value.date) {
+        if (!state.date) {
             return today(getLocalTimeZone());
         } else {
-            const date = new Date(state.value.date);
+            const date = new Date(state.date);
             return new CalendarDate(date.getFullYear(), date.getMonth(), date.getDate());
         }
     },
@@ -245,12 +252,12 @@ const dateProxy = computed({
         if (!value) {
             const thisDay = today(getLocalTimeZone());
             const thisDate = new Date(thisDay.toString());
-            state.value.date = thisDate.toISOString();
+            state.date = thisDate.toISOString();
             return;
         }
 
         const thisDate = new Date(value.toString());
-        state.value.date = thisDate.toISOString();
+        state.date = thisDate.toISOString();
     },
 });
 
@@ -279,15 +286,40 @@ const categoryOptions = computed(() => {
     }).slice(1); // Remove the first option (Income Category)
 });
 
+async function resetForm() {
+    Object.assign(state, cloneDeep(initialState));
+    form.value?.clear();
+}
+
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    if (props.transaction?.id) {
+    try {
+        saving.value = true;
+        await sleep();
+
+        if (props.transaction?.id) {
         // Update account
-        toast.add({ title: "Success", description: "Transaction updated successfully!", color: "success" });
-    } else {
+            toast.add({ title: "Success", description: "Transaction updated successfully!", color: "success" });
+
+            open.value = false;
+        } else {
         // Add account
-        toast.add({ title: "Success", description: "Transaction added successfully!", color: "success" });
+            toast.add({ title: "Success", description: "Transaction added successfully!", color: "success" });
+
+            // reset the value
+            resetForm();
+
+            if (!save.value) {
+                open.value = false;
+            }
+        }
+
+        console.info(event.data);
+        save.value = false;
+    } catch (error) {
+        console.error(error);
+        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+    } finally {
+        saving.value = false;
     }
-    console.info(event.data);
-    open.value = false;
 };
 </script>
