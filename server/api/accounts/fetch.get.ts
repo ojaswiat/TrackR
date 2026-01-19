@@ -1,5 +1,5 @@
 import type { TAccount } from "~~/shared/types/entity.types";
-import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api.const";
+import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 import accountsData from "../../../data/account.json";
 

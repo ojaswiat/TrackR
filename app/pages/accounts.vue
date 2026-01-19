@@ -66,6 +66,7 @@
 
 <script setup lang="ts">
 import { find, isEmpty } from "lodash-es";
+import { ACCOUNTS_FETCH } from "~~/shared/constants/api.const";
 
 definePageMeta({
     title: "Accounts",

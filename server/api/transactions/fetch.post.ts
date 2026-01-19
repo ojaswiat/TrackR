@@ -1,7 +1,7 @@
 import { filter, map, sortBy } from "lodash-es";
 import accountsData from "~~/data/account.json";
 import transactionData from "~~/data/transaction.json";
-import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api.const";
+import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
 type TRequestBody = {

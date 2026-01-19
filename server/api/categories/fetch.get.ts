@@ -1,7 +1,7 @@
 // Fetch all expenses categories only
 
 import categoriesData from "~~/data/category.json";
-import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/api.const";
+import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
 export default defineEventHandler(() => {
