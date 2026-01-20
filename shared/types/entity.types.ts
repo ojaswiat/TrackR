@@ -1,15 +1,21 @@
 import type { TCategoryType, TTransactionType } from "../constants/enums";
 
+export type TUser = {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+};
+
 export type TAccount = {
     id: string;
     name: string;
-    description?: string;
-    color?: string;
-    initial_balance?: number;
+    description: string;
+    color: string;
+    initial_balance: number;
 
-    // TODO: get this from group by query on transaction from DB
-    total_income?: number;
-    total_expense?: number;
+    total_income: number;
+    total_expense: number;
 };
 
 export type TCategory = {
@@ -20,7 +26,7 @@ export type TCategory = {
     type: TCategoryType;
 
     // TODO: get this from group by query on transaction from DB
-    total_amount?: number;
+    total_amount: number;
 };
 
 export type TTransaction = {

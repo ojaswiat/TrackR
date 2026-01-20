@@ -1,45 +1,68 @@
-import type { TAccount } from "~~/shared/types/entity.types";
+import type { TAccount, TUser } from "~~/shared/types/entity.types";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
+import {
+    checkAccountBelongsToUser,
+    checkAccountExist,
+    getAccountDetails,
+    getAllAccountsForUser,
+} from "~~/server/handlers/account.handler";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
-import accountsData from "../../../data/account.json";
 
-export default defineEventHandler((event) => {
-    const query = getQuery(event);
-    const accountId = query.account_id as string | undefined;
+export default defineEventHandler(async (event) => {
+    try {
+        const query = getQuery(event);
+        const user = event.context.user as TUser;
 
-    const allAccounts = accountsData.accounts as TAccount[];
+        const accountId = query.account_id as string | undefined;
+        const { id: userId } = user;
 
-    // If account_id is provided, return only that account
-    if (accountId) {
-        const account = allAccounts.find((acc) => acc.id === accountId);
-        return {
-            statusCode: SERVER_STATUS_CODES.OK,
-            statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
-            message: "Account fetched successfully",
-            data: {
-                accounts: account ? [account] : [],
-            },
-        };
+        // If account_id is provided, return only that account
+        if (accountId) {
+            const accountExists = await checkAccountExist(accountId);
+
+            if (!accountExists) {
+                throw createError({
+                    statusCode: SERVER_STATUS_CODES.NOT_FOUND,
+                    statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
+                    message: "Account not found!",
+                });
+            } else {
+                const accountBelongsToUser = await checkAccountBelongsToUser(accountId, userId);
+                if (!accountBelongsToUser) {
+                    throw createError({
+                        statusCode: SERVER_STATUS_CODES.FORBIDDEN,
+                        statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.FORBIDDEN],
+                        message: "You're not allowed to access this account!",
+                    });
+                } else {
+                    const account = await getAccountDetails(accountId);
+                    return {
+                        statusCode: SERVER_STATUS_CODES.OK,
+                        statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
+                        message: "Account details fetched successfully!",
+                        data: {
+                            account,
+                        },
+                    };
+                }
+            }
+        } else {
+            const accounts = await getAllAccountsForUser(userId);
+            return {
+                statusCode: SERVER_STATUS_CODES.OK,
+                statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
+                message: "Accounts fetched successfully!",
+                data: {
+                    accounts,
+                },
+            };
+        }
+    } catch (error) {
+        console.error(error);
+        throw createError({
+            statusCode: SERVER_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.INTERNAL_SERVER_ERROR],
+            message: "Internal server error!",
+        });
     }
-
-    // If no account_id is provided, create a pseudo "all accounts" object
-    const allAccountsSummary: TAccount = {
-        // TODO: get this from data base
-        id: "acc_000",
-        name: "All Accounts",
-        description: "Combined view of all accounts",
-        color: "#333333",
-        total_income: allAccounts.reduce((acc, curr) => acc + (curr.total_income ?? 0), 0), // TODO: get this from group by query on transaction from DB
-        total_expense: allAccounts.reduce((acc, curr) => acc + (curr.total_expense ?? 0), 0), // TODO: get this from group by query on transaction from DB
-    };
-
-    // Return the pseudo "all accounts" object followed by individual accounts
-    return {
-        statusCode: SERVER_STATUS_CODES.OK,
-        statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
-        message: "Accounts fetched successfully",
-        data: {
-            accounts: [allAccountsSummary, ...allAccounts],
-        },
-    };
 });

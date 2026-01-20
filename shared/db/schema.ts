@@ -32,7 +32,7 @@ export const accounts = pgTable("accounts", {
     id: uuid().primaryKey().default(sql`gen_random_uuid()`),
     name: varchar({ length: 30 }).notNull(),
     user_id: uuid().references(() => users.id, { onDelete: "cascade" }).notNull(),
-    description: varchar({ length: 60 }),
+    description: varchar({ length: 60 }).notNull(),
     color: varchar({ length: 7 }).notNull(), // Hex color: #RRGGBB
     initial_balance: numeric({ precision: 10, scale: 2 }).notNull().default("0"),
 

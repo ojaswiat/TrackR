@@ -78,10 +78,10 @@ useHead({
     title: "Accounts",
 });
 
-const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
+const { data: accountsAPIResponse, error: _accountsAPIError } = await useFetch(ACCOUNTS_FETCH);
 
 const accounts = computed(() => {
-    return accountsResponse.value?.data?.accounts?.slice(1) || [];
+    return (accountsAPIResponse.value as TAPIResponseSuccess<{ accounts: TAccount[] }>)?.data?.accounts?.slice(1) || [];
 });
 
 const edit = ref(false);

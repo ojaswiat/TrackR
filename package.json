@@ -30,7 +30,6 @@
         "nuxt": "^4.2.2",
         "nuxt-charts": "^2.0.0",
         "pinia": "^3.0.4",
-        "postgres": "^3.4.8",
         "zod": "^4.3.5"
     },
     "devDependencies": {
