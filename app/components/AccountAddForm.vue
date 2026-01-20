@@ -46,14 +46,6 @@
                             :style="{ backgroundColor: item.value }">
                         </div>
                     </template>
-
-                    <!-- Commented out for consistency -->
-                    <!-- <template #leading>
-                        <div
-                            class="h-4 w-4 rounded-full mr-2"
-                            :style="{ backgroundColor: state.color }">
-                        </div>
-                    </template> -->
                 </USelect>
             </UFormField>
 
@@ -62,7 +54,7 @@
                 name="initial_balance"
                 required>
                 <UInput
-                    v-model="state.initial_balance"
+                    v-model.number="state.initial_balance"
                     class="w-full"
                     :disabled="edit && !!props.account?.id"
                     type="number"
@@ -70,6 +62,9 @@
                     min="0"
                     placeholder="0.00"
                 />
+                <template #hint>
+                    This will be counted towards income
+                </template>
             </UFormField>
 
             <div class="flex justify-end gap-4 mt-4">
@@ -96,7 +91,9 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
-import z from "zod";
+import type z from "zod";
+import { ACCOUNTS_ADD } from "~~/shared/constants/api.const";
+import { ZAddAccountSchema } from "~~/shared/schemas/zod.schema";
 
 const props = defineProps({
     account: {
@@ -104,6 +101,8 @@ const props = defineProps({
         required: false,
     },
 });
+
+const emits = defineEmits(["update"]);
 
 const toast = useToast();
 
@@ -127,13 +126,8 @@ const colorOptions = [
     { label: "Gold", value: "#FDCB6E" }, // Peachy Gold
 ];
 
-const schema = z.object({
-    name: z.string().min(1, "Account name is required").max(30, "Account name must be 30 characters or less"),
-    initial_balance: z.number().min(0, "Initial balance must be positive"),
-    color: z.string().min(1, "Please choose a color for this account"),
-    description: z.string().max(60, "Description must be 60 characters or less").optional(),
-});
-type Schema = z.output<typeof schema>;
+const schema = ZAddAccountSchema;
+type Schema = z.output<typeof ZAddAccountSchema>;
 
 const initialState = {
     name: edit.value ? props.account?.name || "" : "",
@@ -147,20 +141,27 @@ const state = ref(initialState);
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
         adding.value = true;
-        await sleep();
 
         if (edit.value && props.account?.id) {
         // Update account
             toast.add({ title: "Success", description: "Account updated successfully!", color: "success" });
         } else {
-        // Add account
+            // Add account
+            await $fetch(ACCOUNTS_ADD, {
+                method: "POST",
+                body: event.data,
+            });
+
             toast.add({ title: "Success", description: "Account added successfully!", color: "success" });
         }
-        console.info(event.data);
+
         edit.value = false;
         open.value = false;
-    } catch (error) {
-        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+
+        emits("update");
+    } catch (error: any) {
+        const message = error.response?._data?.message || error.message || "Something went wrong! Please try again later.";
+        toast.add({ title: "Error", description: message, color: "error" });
         console.error(error);
     } finally {
         adding.value = false;

@@ -36,7 +36,7 @@
             </div>
 
             <div class="text-lg font-bold text-left">
-                {{ currency }} {{ (props.account.total_income ?? 0) - (props.account.total_expense ?? 0) }}
+                {{ currency }} {{ (props.account.total_income ?? 0) + (props.account.initial_balance) - (props.account.total_expense ?? 0) }}
             </div>
         </div>
     </UCard>

@@ -1,5 +1,4 @@
 import type { TUser } from "~~/shared/types/entity.types";
-import process from "node:process";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 
 import {
@@ -8,10 +7,11 @@ import {
     getAccountDetails,
     getAllAccountsForUser,
 } from "~~/server/handlers/account.handler";
+import { isDev } from "~~/server/utils/api.utils";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
 export default defineEventHandler(async (event) => {
-    const dev = process.env.NODE_ENV === "development";
+    const dev = isDev();
 
     try {
         const query = getQuery(event);

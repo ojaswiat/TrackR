@@ -34,7 +34,7 @@ export const accounts = pgTable("accounts", {
     user_id: uuid().references(() => users.id, { onDelete: "cascade" }).notNull(),
     description: varchar({ length: 60 }).notNull(),
     color: varchar({ length: 7 }).notNull(), // Hex color: #RRGGBB
-    initial_balance: numeric({ precision: 10, scale: 2 }).notNull().default("0"),
+    initial_balance: numeric({ precision: 10, scale: 2 }).notNull().default("0.00"),
 
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at")

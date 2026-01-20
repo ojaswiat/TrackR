@@ -40,6 +40,7 @@
                     v-model:edit="edit"
                     v-model:open="showAddAccountModal"
                     :account="selectedAccountItem"
+                    @update="() => refreshAccounts()"
                 />
             </template>
         </UModal>
@@ -78,7 +79,7 @@ useHead({
     title: "Accounts",
 });
 
-const { data: accountsAPIResponse, error: _accountsAPIError } = await useFetch(ACCOUNTS_FETCH);
+const { data: accountsAPIResponse, error: _accountsAPIError, refresh: refreshAccounts } = await useFetch(ACCOUNTS_FETCH);
 
 const accounts = computed(() => {
     return (accountsAPIResponse.value as TAPIResponseSuccess<{ accounts: TAccount[] }>)?.data?.accounts?.slice(1) || [];
@@ -95,7 +96,7 @@ const selectedAccountItem = computed(() => {
 });
 // TODO: remove mock data
 const summary = computed(() => ({
-    total_income: selectedAccountItem.value?.total_income || 0,
+    total_income: (selectedAccountItem.value?.total_income ?? 0) + (selectedAccountItem.value?.initial_balance ?? 0),
     total_expense: selectedAccountItem.value?.total_expense || 0,
 }));
 

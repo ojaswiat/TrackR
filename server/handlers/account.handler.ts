@@ -27,12 +27,7 @@ export async function checkAccountBelongsToUser(accountId: string, userId: strin
 
 // create a function to get account details:
 export async function getAccountDetails(accountId: string): Promise<TAccount> {
-    const account = await db
-        .query
-        .accounts
-        .findFirst({
-            where: eq(accounts.id, accountId),
-        });
+    const [account] = await db.select().from(accounts).where(eq(accounts.id, accountId));
 
     if (!account) {
         throw new Error("Account not found");
@@ -60,10 +55,14 @@ export async function getAccountDetails(accountId: string): Promise<TAccount> {
     });
 
     return {
-        ...account,
+        id: account.id,
+        name: account.name,
+        description: account.description,
+        color: account.color,
+        initial_balance: Number(account.initial_balance),
         total_income,
         total_expense,
-    } as TAccount;
+    };
 }
 
 // create a function to get all accounts for a user
@@ -80,7 +79,10 @@ export async function getAllAccountsForUser(userId: string): Promise<TAccount[]>
         .groupBy(accounts.id);
 
     const accountsWithTotals = map(result, ({ account, total_income, total_expense }) => ({
-        ...account,
+        id: account.id,
+        name: account.name,
+        description: account.description,
+        color: account.color,
         initial_balance: Number(account.initial_balance),
         total_income: Number(total_income),
         total_expense: Number(total_expense),
@@ -90,11 +92,52 @@ export async function getAllAccountsForUser(userId: string): Promise<TAccount[]>
         id: "acc_000",
         name: "All Accounts",
         description: "Combined view of all accounts",
-        initial_balance: 0,
         color: "#333333",
+        initial_balance: 0,
         total_income: reduce(accountsWithTotals, (acc, curr) => acc + (curr.total_income ?? 0), 0),
         total_expense: reduce(accountsWithTotals, (acc, curr) => acc + (curr.total_expense ?? 0), 0),
     };
 
     return [allAccountsSummary, ...accountsWithTotals];
+}
+
+export async function checkCanUserAddAccount(userId: string): Promise<boolean> {
+    const existingAccountsCount = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(accounts)
+        .where(eq(accounts.user_id, userId));
+
+    return Number(existingAccountsCount[0].count) < 5;
+}
+
+// create a function to add account for a user
+export async function addAccountForUser(
+    userId: string,
+    payload: {
+        name: string;
+        initial_balance: number;
+        color: string;
+        description?: string;
+    },
+): Promise<TAccount> {
+    const [newAccount] = await db
+        .insert(accounts)
+        .values({
+            name: payload.name,
+            user_id: userId,
+            description: payload.description || "",
+            color: payload.color,
+            initial_balance: String(payload.initial_balance),
+        })
+        .returning();
+
+    return {
+        id: newAccount.id,
+        name: newAccount.name,
+        description: newAccount.description,
+        color: newAccount.color,
+        initial_balance: Number(newAccount.initial_balance),
+        total_income: 0,
+        total_expense: 0,
+    };
 }
