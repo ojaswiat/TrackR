@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
 import type z from "zod";
-import { ACCOUNTS_REMOVE } from "~~/shared/constants/api.const";
+import { ACCOUNTS_DELETE } from "~~/shared/constants/api.const";
 import { ZDeleteAccountSchema } from "~~/shared/schemas/zod.schema";
 
 const props = defineProps({
@@ -81,7 +81,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 
         deleting.value = true;
 
-        await $fetch(`${ACCOUNTS_REMOVE}/${props.account.id}`, {
+        await $fetch(`${ACCOUNTS_DELETE}/${props.account.id}`, {
             method: "DELETE",
             body: event.data,
         });
