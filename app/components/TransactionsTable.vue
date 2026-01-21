@@ -63,6 +63,7 @@
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { find, map, reduce } from "lodash-es";
+import { TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
 import { DEFAULT_ALL_ACCOUNT_ID } from "~~/shared/constants/data.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
@@ -116,11 +117,9 @@ const accountsMap = computed<Record<string, TAccount>>(() => {
 const { data: transactionsResponse } = await useAsyncData(
     () => `transactions-${props.selectedAccount}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
-        method: "POST",
-        body: {
-            filters: {
-                account_id: props.selectedAccount === DEFAULT_ALL_ACCOUNT_ID ? [] : [props.selectedAccount],
-            },
+        method: "GET",
+        query: {
+            account_id: props.selectedAccount === DEFAULT_ALL_ACCOUNT_ID ? undefined : props.selectedAccount,
         },
     }),
     { watch: [() => props.selectedAccount] },

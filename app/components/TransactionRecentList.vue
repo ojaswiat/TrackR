@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+import { TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
 import { DEFAULT_ALL_ACCOUNT_ID } from "~~/shared/constants/data.const";
 
 const props = defineProps({
@@ -28,11 +29,9 @@ const props = defineProps({
 const { data: transactionsResponse } = await useAsyncData(
     () => `transactions-${props.selectedAccount}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
-        method: "POST",
-        body: {
-            filters: {
-                account_id: props.selectedAccount === DEFAULT_ALL_ACCOUNT_ID ? [] : [props.selectedAccount],
-            },
+        method: "GET",
+        query: {
+            account_id: props.selectedAccount === DEFAULT_ALL_ACCOUNT_ID ? undefined : props.selectedAccount,
         },
     }),
     { watch: [() => props.selectedAccount] },

@@ -19,7 +19,8 @@ export default defineEventHandler(async (event) => {
             if (error || !user) {
                 throw createError({
                     statusCode: SERVER_STATUS_CODES.UNAUTHORIZED,
-                    message: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.UNAUTHORIZED],
+                    statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.UNAUTHORIZED],
+                    message: "Unauthorized",
                 });
             }
 
@@ -29,6 +30,7 @@ export default defineEventHandler(async (event) => {
             throw createError({
                 statusCode: SERVER_STATUS_CODES.UNAUTHORIZED,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.UNAUTHORIZED],
+                message: "Unauthorized",
             });
         }
     }

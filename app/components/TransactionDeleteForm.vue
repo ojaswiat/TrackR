@@ -33,6 +33,8 @@
 </template>
 
 <script setup lang="ts">
+import { TRANSACTIONS_DELETE } from "~~/shared/constants/api.const";
+
 const props = defineProps({
     transaction: {
         type: Object as PropType<TTransaction>,
@@ -49,10 +51,12 @@ const deleting = ref(false);
 async function onSubmit() {
     try {
         deleting.value = true;
-        await sleep();
+
+        await $fetch(`${TRANSACTIONS_DELETE}/${props.transaction?.id}`, {
+            method: "DELETE",
+        });
 
         toast.add({ title: "Success", description: "Transaction deleted successfully!", color: "success" });
-        console.info(props.transaction?.id);
         open.value = false;
     } catch (error) {
         toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });

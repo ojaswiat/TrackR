@@ -1,10 +1,14 @@
 import type { TUser } from "~~/shared/types/entity.types";
 import { z } from "zod";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
-import { checkAccountBelongsToUser, checkAccountExists, updateAccountForUser } from "~~/server/handlers/account.handler";
+import {
+    canUserUpdateTransaction,
+    checkTransactionExists,
+    updateTransactionForUser,
+} from "~~/server/handlers/transaction.handler";
 import { isDev } from "~~/server/utils/api.utils";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
-import { ZEditAccountSchema } from "~~/shared/schemas/zod.schema";
+import { ZEditTransactionSchema } from "~~/shared/schemas/zod.schema";
 
 export default defineEventHandler(async (event) => {
     const dev = isDev();
@@ -14,37 +18,38 @@ export default defineEventHandler(async (event) => {
         const id = getRouterParam(event, "id");
 
         // Validate ID
-        const idSchema = z.uuidv4("Invalid account ID");
+        const idSchema = z.uuidv4("Invalid transaction ID");
         const idResult = idSchema.safeParse(id);
         if (!idResult.success) {
             throw createError({
                 statusCode: SERVER_STATUS_CODES.BAD_REQUEST,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.BAD_REQUEST],
-                message: "Invalid account ID",
+                message: "Invalid transaction ID",
             });
         }
 
-        const accountExists = await checkAccountExists(id!);
-        if (!accountExists) {
+        // Check existence
+        const exists = await checkTransactionExists(id!);
+        if (!exists) {
             throw createError({
                 statusCode: SERVER_STATUS_CODES.NOT_FOUND,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
-                message: "Account not found",
+                message: "Transaction not found",
             });
         }
 
         // Check ownership
-        const canUpdate = await checkAccountBelongsToUser(id!, user.id);
+        const canUpdate = await canUserUpdateTransaction(id!, user.id);
         if (!canUpdate) {
             throw createError({
                 statusCode: SERVER_STATUS_CODES.FORBIDDEN,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.FORBIDDEN],
-                message: "You are not allowed to update this account",
+                message: "You are not allowed to update this transaction",
             });
         }
 
         const body = await readBody(event);
-        const result = ZEditAccountSchema.safeParse(body);
+        const result = ZEditTransactionSchema.safeParse(body);
 
         if (!result.success) {
             throw createError({
@@ -55,7 +60,7 @@ export default defineEventHandler(async (event) => {
             });
         }
 
-        const updatedAccount = await updateAccountForUser(user.id, {
+        const updatedTransaction = await updateTransactionForUser(user.id, {
             id: id!,
             ...result.data,
         });
@@ -63,9 +68,9 @@ export default defineEventHandler(async (event) => {
         return {
             statusCode: SERVER_STATUS_CODES.OK,
             statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.OK],
-            message: "Account updated successfully!",
+            message: "Transaction updated successfully!",
             data: {
-                account: updatedAccount,
+                transaction: updatedTransaction,
             },
         };
     } catch (error) {

@@ -56,7 +56,7 @@
                 name="account"
                 required>
                 <USelect
-                    v-model="state.account"
+                    v-model="state.account_id"
                     class="w-full"
                     :items="accountOptions"
                     placeholder="Select an account">
@@ -75,7 +75,7 @@
                 name="category"
                 required>
                 <USelect
-                    v-model="state.category"
+                    v-model="state.category_id"
                     class="w-full"
                     :items="categoryOptions"
                     :disabled="state.type === TRANSACTION_TYPE.INCOME"
@@ -157,11 +157,12 @@
 
 <script setup lang="ts">
 import type { FormSubmitEvent } from "@nuxt/ui";
+import type { z } from "zod";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { cloneDeep, map } from "lodash-es";
-import { z } from "zod";
-import { ACCOUNTS_FETCH, CATEGORIES_FETCH } from "~~/shared/constants/api.const";
+import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
+import { ZAddTransactionSchema } from "~~/shared/schemas/zod.schema";
 
 const props = defineProps({
     transaction: {
@@ -179,44 +180,10 @@ const categories = computed(() => {
 });
 
 const accounts = computed(() => {
-    return accountsResponse.value?.data?.accounts || [];
+    return (accountsResponse.value as TAPIResponseSuccess<{ accounts: TAccount[] }>)?.data?.accounts || [];
 });
 
-const schema = z.object({
-    type: z
-        .number()
-        .refine((val) => val === 0 || val === 1, {
-            message: "Type is required",
-        }),
-    date: z
-        .string()
-        .min(1, { message: "Date is required" })
-        .refine((val) => {
-            if (!val) {
-                return false;
-            }
-            const date = new Date(val);
-            return !Number.isNaN(date.getTime());
-        }, { message: "Date must be a valid date" }),
-    category: z.string().optional(), // Make optional first
-    account: z
-        .string()
-        .min(1, { message: "Account is required" }),
-    amount: z.number().min(0.01, { message: "Amount must be greater than 0.00" }),
-    description: z
-        .string()
-        .min(1, { message: "Description is required" })
-        .max(60, { message: "Description must be at most 60 characters" }),
-}).refine((data) => {
-    // Category required ONLY for expense (type === 1)
-    if (data.type === TRANSACTION_TYPE.EXPENSE && !data.category?.trim()) {
-        return false;
-    }
-    return true;
-}, {
-    message: "Category is required for expenses",
-    path: ["category"], // Error shows on category field
-});
+const schema = ZAddTransactionSchema;
 type Schema = z.output<typeof schema>;
 
 const toast = useToast();
@@ -232,8 +199,8 @@ const inputDate = useTemplateRef("inputDate");
 const initialState = {
     type: props.transaction?.type ?? 1,
     date: props.transaction?.created_at ?? today(getLocalTimeZone()).toString(),
-    category: props.transaction?.category_id ?? "",
-    account: props.transaction?.account_id ?? "",
+    category_id: props.transaction?.category_id ?? "",
+    account_id: props.transaction?.account_id ?? "",
     amount: props.transaction?.amount ?? 0.00,
     description: props.transaction?.description ?? "",
 };
@@ -295,15 +262,24 @@ async function resetForm() {
 async function onSubmit(event: FormSubmitEvent<Schema>) {
     try {
         saving.value = true;
-        await sleep();
 
         if (props.transaction?.id) {
-        // Update account
+            // Update transaction
+            await $fetch(`${TRANSACTIONS_UPDATE}/${props.transaction.id}`, {
+                method: "PUT",
+                body: event.data,
+            });
+
             toast.add({ title: "Success", description: "Transaction updated successfully!", color: "success" });
 
             open.value = false;
         } else {
-        // Add account
+            // Add transaction
+            await $fetch(TRANSACTIONS_ADD, {
+                method: "POST",
+                body: event.data,
+            });
+
             toast.add({ title: "Success", description: "Transaction added successfully!", color: "success" });
 
             // reset the value
@@ -314,7 +290,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             }
         }
 
-        console.info(event.data);
         save.value = false;
     } catch (error) {
         console.error(error);

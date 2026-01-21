@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRANSACTION_TYPE } from "../constants/enums";
 
 export const ZAddAccountSchema = z.object({
     name: z.string().min(1, "Account name is required").max(30, "Account name must be 30 characters or less"),
@@ -12,3 +13,43 @@ export const ZEditAccountSchema = ZAddAccountSchema;
 export const ZDeleteAccountSchema = z.object({
     keep_transactions: z.boolean().default(true),
 });
+
+export const ZAddTransactionSchema = z.object({
+    type: z
+        .number()
+        .refine((val) => val === 0 || val === 1, {
+            message: "Type is required",
+        }),
+    date: z
+        .string()
+        .min(1, { message: "Date is required" })
+        .refine((val) => {
+            if (!val) {
+                return false;
+            }
+            const date = new Date(val);
+            return !Number.isNaN(date.getTime());
+        }, { message: "Date must be a valid date" }),
+    category_id: z
+        .uuidv4()
+        .min(1, { message: "Category is required" }),
+    account_id: z
+        .uuidv4()
+        .min(1, { message: "Account is required" }),
+    amount: z.number().min(0.01, { message: "Amount must be greater than 0.00" }),
+    description: z
+        .string()
+        .min(1, { message: "Description is required" })
+        .max(60, { message: "Description must be at most 60 characters" }),
+}).refine((data) => {
+    // Category required ONLY for expense (type === 1)
+    if (data.type === TRANSACTION_TYPE.EXPENSE && !data.category_id?.trim()) {
+        return false;
+    }
+    return true;
+}, {
+    message: "Category is required for expenses",
+    path: ["category"], // Error shows on category field
+});
+
+export const ZEditTransactionSchema = ZAddTransactionSchema;

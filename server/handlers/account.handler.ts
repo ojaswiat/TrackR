@@ -7,7 +7,7 @@ import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { accounts, transactions } from "~~/shared/db/schema";
 
 // create a function to check if account exists
-export async function checkAccountExist(accountId: string): Promise<boolean> {
+export async function checkAccountExists(accountId: string): Promise<boolean> {
     const result = await db
         .select({ id: accounts.id })
         .from(accounts)

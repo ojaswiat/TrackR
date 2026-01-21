@@ -1,7 +1,7 @@
 import type { TUser } from "~~/shared/types/entity.types";
 import { z } from "zod";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
-import { checkAccountBelongsToUser, deleteAccountForUser } from "~~/server/handlers/account.handler";
+import { checkAccountBelongsToUser, checkAccountExists, deleteAccountForUser } from "~~/server/handlers/account.handler";
 import { isDev } from "~~/server/utils/api.utils";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 import { ZDeleteAccountSchema } from "~~/shared/schemas/zod.schema";
@@ -21,6 +21,15 @@ export default defineEventHandler(async (event) => {
                 statusCode: SERVER_STATUS_CODES.BAD_REQUEST,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.BAD_REQUEST],
                 message: "Invalid account ID",
+            });
+        }
+
+        const accountExists = await checkAccountExists(id!);
+        if (!accountExists) {
+            throw createError({
+                statusCode: SERVER_STATUS_CODES.NOT_FOUND,
+                statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.NOT_FOUND],
+                message: "Account not found",
             });
         }
 

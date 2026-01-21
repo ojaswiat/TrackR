@@ -2,6 +2,13 @@
     - Put the server side queries to handlers such that some page specific apis can be created such as /dashboard.get.ts.
     - Add pagination to all the APIs.
     - Add Date range filter to all the APIs and use that to display the data on the dashboard.
+    ```typescript
+    type TRequestBody = {
+        filters?: {
+            account_id?: string[];
+        };
+    };
+    ```
 - Integrate the back-end APIs with the front-end.
     - Move category and accounts to their store.
     - Toast for success and error messages
