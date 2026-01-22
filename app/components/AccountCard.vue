@@ -36,7 +36,11 @@
             </div>
 
             <div class="text-lg font-bold text-left">
-                {{ currency }} {{ (props.account.total_income ?? 0) + (props.account.initial_balance) - (props.account.total_expense ?? 0) }}
+                {{ formatCurrency(
+                    (props.account.total_income ?? 0)
+                        + (props.account.initial_balance)
+                        - (props.account.total_expense ?? 0),
+                ) }}
             </div>
         </div>
     </UCard>
@@ -51,12 +55,6 @@ const props = defineProps({
 });
 
 const selectedAccount = defineModel<string>("selectedAccount");
-
-// TODO: Get this from the user store
-const currency = computed(() => {
-    // return useUserStore().user?.currency || "£";
-    return "£";
-});
 
 function handleAccountSelect(accountId: string) {
     selectedAccount.value = accountId;

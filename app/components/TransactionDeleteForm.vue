@@ -58,8 +58,10 @@ async function onSubmit() {
 
         toast.add({ title: "Success", description: "Transaction deleted successfully!", color: "success" });
         open.value = false;
-    } catch (error) {
-        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
+    } catch (e) {
+        const error = e as TAPIResponseError;
+        const message = error.message || "Something went wrong! Please try again later.";
+        toast.add({ title: "Error", description: message, color: "error" });
         console.error(error);
     } finally {
         deleting.value = false;

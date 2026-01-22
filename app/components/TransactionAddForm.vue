@@ -21,7 +21,7 @@
                 <UFormField
                     class="flex flex-col gap-1"
                     label="Date"
-                    name="date"
+                    name="transaction_date"
                     required>
                     <UInputDate
                         ref="inputDate"
@@ -199,8 +199,8 @@ const inputDate = useTemplateRef("inputDate");
 const initialState = {
     type: props.transaction?.type ?? 1,
     date: props.transaction?.created_at ?? today(getLocalTimeZone()).toString(),
-    category_id: props.transaction?.category_id ?? "",
-    account_id: props.transaction?.account_id ?? "",
+    category_id: props.transaction?.category_id ?? "aidnoss",
+    account_id: props.transaction?.account_id ?? "aonoinga",
     amount: props.transaction?.amount ?? 0.00,
     description: props.transaction?.description ?? "",
 };
@@ -291,9 +291,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         }
 
         save.value = false;
-    } catch (error) {
+    } catch (e) {
+        const error = e as TAPIResponseError;
+        const message = error.message || "Something went wrong! Please try again later.";
+        toast.add({ title: "Error", description: message, color: "error" });
         console.error(error);
-        toast.add({ title: "Error", description: "Something went wrong! Please try again later.", color: "error" });
     } finally {
         saving.value = false;
     }

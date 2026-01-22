@@ -18,7 +18,7 @@
                     {{ props.transaction.description }}
                 </p>
                 <p class="text-muted font-sm">
-                    {{ useDateTimeFormatter(props.transaction.created_at).date }}
+                    {{ useDateTimeFormatter(props.transaction.transaction_date).date }}
                 </p>
             </div>
         </div>

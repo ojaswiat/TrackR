@@ -36,6 +36,7 @@ export type TTransaction = {
     account_id: string;
     amount: number;
     description: string;
+    transaction_date: string;
     created_at: string;
     updated_at: string;
 };

@@ -145,9 +145,9 @@ const transactions = computed(() => {
 
 const columns: TableColumn<TTransactionUI>[] = [
     {
-        accessorKey: "created_at",
+        accessorKey: "transaction_date",
         header: "Date",
-        cell: ({ row }) => useDateTimeFormatter(row.getValue("created_at")).date,
+        cell: ({ row }) => useDateTimeFormatter(row.getValue("transaction_date")).date,
     },
     {
         accessorKey: "category_name",

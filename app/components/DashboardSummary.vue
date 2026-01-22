@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ currency }} {{ props.summary.total_income }}
+                    {{ formatCurrency(props.summary.total_income) }}
                 </p>
             </div>
         </UCard>
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ currency }} {{ props.summary.total_expense }}
+                    {{ formatCurrency(props.summary.total_expense) }}
                 </p>
             </div>
         </UCard>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ currency }} {{ props.summary.total_income - props.summary.total_expense }}
+                    {{ formatCurrency(props.summary.total_income - props.summary.total_expense) }}
                 </p>
             </div>
         </UCard>
@@ -65,11 +65,5 @@ const props = defineProps({
         type: Object as PropType<TAccountSummary>,
         required: true,
     },
-});
-
-// TODO: Fetch default currency from user store
-const currency = computed(() => {
-    // return useUserStore().user?.currency || "£";
-    return "£";
 });
 </script>

@@ -42,21 +42,26 @@ export async function getTransactionDetails(transactionId: string): Promise<TTra
         account_id: transaction.account_id || "",
         amount: Number(transaction.amount),
         description: transaction.description,
+        transaction_date: transaction.transaction_date.toISOString(),
         created_at: transaction.created_at.toISOString(),
         updated_at: transaction.updated_at.toISOString(),
     };
 }
 
 export async function getAllTransactionsForUser(userId: string, filters?: { account_id?: string }): Promise<TTransaction[]> {
-    const conditions = filters?.account_id
-        ? [eq(transactions.account_id, filters.account_id)]
-        : [eq(transactions.user_id, userId)];
+    const conditions = [];
+
+    if (filters?.account_id) {
+        conditions.push(eq(transactions.account_id, filters.account_id));
+    } else {
+        conditions.push(eq(transactions.user_id, userId));
+    }
 
     const result = await db
         .select()
         .from(transactions)
         .where(and(...conditions))
-        .orderBy(desc(transactions.created_at));
+        .orderBy(desc(transactions.transaction_date));
 
     return result.map((t) => ({
         id: t.id,
@@ -65,6 +70,7 @@ export async function getAllTransactionsForUser(userId: string, filters?: { acco
         account_id: t.account_id || "",
         amount: Number(t.amount),
         description: t.description,
+        transaction_date: t.transaction_date.toISOString(),
         created_at: t.created_at.toISOString(),
         updated_at: t.updated_at.toISOString(),
     }));
@@ -78,6 +84,7 @@ export async function addTransactionForUser(
         category_id: string;
         account_id?: string;
         description: string;
+        transaction_date: string;
         created_at?: string;
     },
 ): Promise<TTransaction> {
@@ -90,9 +97,14 @@ export async function addTransactionForUser(
             category_id: payload.category_id,
             account_id: payload.account_id,
             description: payload.description,
+            transaction_date: new Date(payload.transaction_date),
             created_at: payload.created_at ? new Date(payload.created_at) : undefined,
         })
         .returning();
+
+    if (!newTransaction) {
+        throw new Error("Failed to create transaction");
+    }
 
     return {
         id: newTransaction.id,
@@ -101,6 +113,7 @@ export async function addTransactionForUser(
         account_id: newTransaction.account_id || "",
         amount: Number(newTransaction.amount),
         description: newTransaction.description,
+        transaction_date: newTransaction.transaction_date.toISOString(),
         created_at: newTransaction.created_at.toISOString(),
         updated_at: newTransaction.updated_at.toISOString(),
     };
@@ -115,6 +128,7 @@ export async function updateTransactionForUser(
         category_id: string;
         account_id?: string;
         description: string;
+        transaction_date: string;
         created_at?: string;
     },
 ): Promise<TTransaction> {
@@ -126,6 +140,7 @@ export async function updateTransactionForUser(
             category_id: payload.category_id,
             account_id: payload.account_id,
             description: payload.description,
+            transaction_date: new Date(payload.transaction_date),
             created_at: payload.created_at ? new Date(payload.created_at) : undefined,
         })
         .where(and(eq(transactions.id, payload.id), eq(transactions.user_id, userId)));

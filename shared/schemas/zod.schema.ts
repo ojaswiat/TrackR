@@ -20,7 +20,7 @@ export const ZAddTransactionSchema = z.object({
         .refine((val) => val === 0 || val === 1, {
             message: "Type is required",
         }),
-    date: z
+    transaction_date: z
         .string()
         .min(1, { message: "Date is required" })
         .refine((val) => {

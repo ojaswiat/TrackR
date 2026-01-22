@@ -75,6 +75,7 @@ export const transactions = pgTable("transactions", {
     account_id: uuid().references(() => accounts.id, { onDelete: "set null" }), // Users have option to delete account without deleting the transaction
     amount: numeric({ precision: 10, scale: 2 }).notNull(),
     description: varchar({ length: 60 }).notNull(),
+    transaction_date: timestamp("transaction_date").defaultNow().notNull(),
 
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at")
