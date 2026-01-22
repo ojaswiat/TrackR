@@ -1,5 +1,5 @@
 <template>
-    <header class="w-full flex justify-between items-start gap-2">
+    <header class="w-full flex justify-between items-start gap-4">
         <div class="flex flex-col gap-2">
             <h1 class="text-4xl font-bold">
                 {{ metaTitle || 'Dashboard' }}

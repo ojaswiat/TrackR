@@ -1,11 +1,21 @@
 <template>
     <div class="flex flex-col gap-8">
-        <div class="flex justify-end px-4">
+        <div class="flex items-center justify-end px-4 gap-2">
             <UButton
                 class="w-fit"
                 icon="i-lucide:plus"
+                size="sm"
                 @click="showAddAccountModal = true">
                 Add Account
+            </UButton>
+
+            <UButton
+                icon="lucide:refresh-ccw"
+                size="sm"
+                :loading="loading"
+                variant="outline"
+                @click="() => refreshAccounts()">
+                Refresh
             </UButton>
         </div>
 
@@ -80,7 +90,12 @@ useHead({
     title: "Accounts",
 });
 
-const { data: accountsAPIResponse, error: _accountsAPIError, refresh: refreshAccounts } = await useFetch(ACCOUNTS_FETCH);
+const {
+    data: accountsAPIResponse,
+    error: _accountsAPIError,
+    refresh: refreshAccounts,
+    pending: loading,
+} = await useFetch(ACCOUNTS_FETCH);
 
 const accounts = computed(() => {
     return (accountsAPIResponse.value as TAPIResponseSuccess<{ accounts: TAccount[] }>)?.data?.accounts || [];

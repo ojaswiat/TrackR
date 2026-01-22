@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full flex flex-col gap-8">
+    <div class="flex flex-col gap-8">
         <DashboardFilters
             v-model:selected-account="selectedAccount"
             v-model:selected-date-range="selectedDateRange"
@@ -13,7 +13,7 @@
         />
         <DashboardAccounts
             v-model:selected-account="selectedAccount"
-            class="px-4"
+            class="mx-4"
             :accounts="accounts"
         />
 

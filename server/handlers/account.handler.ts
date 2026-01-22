@@ -132,6 +132,10 @@ export async function addAccountForUser(
         })
         .returning();
 
+    if (!newAccount) {
+        throw new Error("Failed to create account");
+    }
+
     return {
         id: newAccount.id,
         name: newAccount.name,

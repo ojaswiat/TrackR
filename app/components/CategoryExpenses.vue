@@ -18,6 +18,7 @@
 </template>
 
 <script setup lang="ts">
+import { CATEGORIES_EXPENSE_FETCH } from "~~/shared/constants/api.const";
 import { DEFAULT_ALL_ACCOUNT_ID } from "~~/shared/constants/data.const";
 
 const props = defineProps({

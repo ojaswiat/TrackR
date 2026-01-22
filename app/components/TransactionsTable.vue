@@ -5,14 +5,14 @@
                 All Transactions
             </h5>
             <p class="text-muted text-sm">
-                Showing transactions for {{ accountsMap[props.selectedAccount || DEFAULT_ALL_ACCOUNT_ID]?.name }}
+                Showing transactions for {{ props.selectedAccountName }}
             </p>
 
             <div class="h-[calc(100vh-28rem)] overflow-y-scroll mt-4">
                 <UTable
                     :columns="columns"
                     :column-visibility="columnVisibility"
-                    :data="transactions"
+                    :data="props.transactions"
                     :ui="{
                         root: 'px-0 overflow-auto',
                     }"
@@ -62,26 +62,16 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
-import { find, map, reduce } from "lodash-es";
-import { TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
-import { DEFAULT_ALL_ACCOUNT_ID } from "~~/shared/constants/data.const";
+import { find } from "lodash-es";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 const props = defineProps({
-    selectedAccount: {
+    selectedAccountName: {
         type: String,
         required: false,
     },
-    selectedCategory: {
-        type: String,
-        required: false,
-    },
-    accounts: {
-        type: Array as PropType<TAccount[]>,
-        required: true,
-    },
-    categories: {
-        type: Array as PropType<TCategory[]>,
+    transactions: {
+        type: Array as PropType<TTransactionUI[]>,
         required: true,
     },
 });
@@ -91,57 +81,6 @@ const UDropdownMenu = resolveComponent("UDropdownMenu");
 const showEditTransactionModal = ref(false);
 const showDeleteTransactionModal = ref(false);
 const selectedTransaction = ref<TTransaction>();
-
-const categoriesMap = computed<Record<string, TCategory>>(() => {
-    return reduce(
-        props.categories,
-        (accumulator, category) => {
-            accumulator[category.id] = category;
-            return accumulator;
-        },
-        {} as Record<string, TCategory>,
-    );
-});
-
-const accountsMap = computed<Record<string, TAccount>>(() => {
-    return reduce(
-        props.accounts,
-        (accumulator, account) => {
-            accumulator[account.id] = account;
-            return accumulator;
-        },
-        {} as Record<string, TAccount>,
-    );
-});
-
-const { data: transactionsResponse } = await useAsyncData(
-    () => `transactions-${props.selectedAccount}`, // Dynamic key for caching
-    () => $fetch(TRANSACTIONS_FETCH, {
-        method: "GET",
-        query: {
-            account_id: props.selectedAccount === DEFAULT_ALL_ACCOUNT_ID ? undefined : props.selectedAccount,
-        },
-    }),
-    { watch: [() => props.selectedAccount] },
-);
-
-const transactions = computed(() => {
-    const transactionsWithoutCategory = transactionsResponse.value?.data.transactions;
-    const transactionWithCategory = map(transactionsWithoutCategory, (transaction) => {
-        const transactionCategory = categoriesMap.value[transaction.category_id];
-        const transactionAccount = accountsMap.value[transaction.account_id];
-
-        return {
-            ...transaction,
-            category_name: transactionCategory?.name,
-            category_color: transactionCategory?.color,
-            account_name: transactionAccount?.name,
-            account_color: transactionAccount?.color,
-        };
-    });
-
-    return transactionWithCategory as TTransactionUI[];
-});
 
 const columns: TableColumn<TTransactionUI>[] = [
     {
@@ -284,12 +223,12 @@ function getRowItems(row: Row<TTransactionUI>) {
 }
 
 function onTransactionEdit(id: string) {
-    selectedTransaction.value = find(transactions.value, (transaction) => transaction.id === id);
+    selectedTransaction.value = find(props.transactions, (transaction) => transaction.id === id);
     showEditTransactionModal.value = true;
 }
 
 function onTransactionDelete(id: string) {
-    selectedTransaction.value = find(transactions.value, (transaction) => transaction.id === id);
+    selectedTransaction.value = find(props.transactions, (transaction) => transaction.id === id);
     showDeleteTransactionModal.value = true;
 }
 </script>

@@ -159,8 +159,9 @@
 import type { FormSubmitEvent } from "@nuxt/ui";
 import type { z } from "zod";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
-import { cloneDeep, map } from "lodash-es";
+import { cloneDeep, filter, map } from "lodash-es";
 import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
+import { DEFAULT_ALL_CATEGORY_ID } from "~~/shared/constants/data.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { ZAddTransactionSchema } from "~~/shared/schemas/zod.schema";
 
@@ -199,8 +200,8 @@ const inputDate = useTemplateRef("inputDate");
 const initialState = {
     type: props.transaction?.type ?? 1,
     date: props.transaction?.created_at ?? today(getLocalTimeZone()).toString(),
-    category_id: props.transaction?.category_id ?? "aidnoss",
-    account_id: props.transaction?.account_id ?? "aonoinga",
+    category_id: props.transaction?.category_id ?? "",
+    account_id: props.transaction?.account_id ?? "",
     amount: props.transaction?.amount ?? 0.00,
     description: props.transaction?.description ?? "",
 };
@@ -245,13 +246,17 @@ const accountOptions = computed(() => {
 });
 
 const categoryOptions = computed(() => {
-    return map(categories.value, (category) => {
+    const noAllAccountCategory = filter(categories.value, (category) => category.id !== DEFAULT_ALL_CATEGORY_ID);
+
+    const items = map(noAllAccountCategory, (category) => {
         return {
             label: category.name,
             value: category.id,
             color: category.color,
         };
-    }).slice(1); // Remove the first option (Income Category)
+    });
+
+    return items;
 });
 
 async function resetForm() {

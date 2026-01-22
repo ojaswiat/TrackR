@@ -11,7 +11,8 @@
             v-model="selectedCategory"
             class="w-40"
             :items="categorySelectOptions"
-            placeholder="Select a category">
+            placeholder="Select a category"
+            :disabled="selectedType === TRANSACTION_TYPE.INCOME">
             <template #item-leading="{ item }">
                 <div
                     class="h-2 w-2 rounded-full mt-[6px] mr-2"
@@ -33,13 +34,21 @@
         </USelect>
 
         <UIDateFilter v-model:selected-date-range="selectedDateRange" />
+
+        <UButton
+            icon="lucide:refresh-ccw"
+            size="sm"
+            variant="outline"
+            :loading="props.loading"
+            @click="emits('refresh')">
+            Refresh
+        </UButton>
     </div>
 </template>
 
 <script setup lang="ts">
 import type { DateValue } from "@internationalized/date";
 import type { TTransactionType } from "~~/shared/constants/enums";
-import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
 import { map } from "lodash-es";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
@@ -52,7 +61,13 @@ const props = defineProps({
         type: Object as PropType<TCategory[]>,
         required: true,
     },
+    loading: {
+        type: Boolean,
+        required: true,
+    },
 });
+
+const emits = defineEmits(["refresh"]);
 
 const selectedType = defineModel<TTransactionType>("selectedType");
 const selectedAccount = defineModel<string>("selectedAccount");
@@ -72,6 +87,13 @@ const categorySelectOptions = computed(() => map(props.categories, (category) =>
 })));
 
 const typeSelectOptions = ref([
+    {
+        label: "All",
+        value: undefined,
+        chip: {
+            color: "info" as const,
+        },
+    },
     {
         label: "Expense",
         value: TRANSACTION_TYPE.EXPENSE,

@@ -19,6 +19,15 @@
             </USelect>
 
             <UIDateFilter v-model:selected-date-range="selectedDateRange" />
+
+            <UButton
+                icon="lucide:refresh-ccw"
+                size="sm"
+                variant="outline"
+                :loading="loading"
+                @click="emits('refresh')">
+                Refresh
+            </UButton>
         </div>
     </div>
 </template>
@@ -34,6 +43,8 @@ const props = defineProps({
     },
 });
 
+const emits = defineEmits(["refresh"]);
+
 const selectedAccount = defineModel<string>("selectedAccount");
 const selectedDateRange = defineModel<{ start: DateValue; end: DateValue }>("selectedDateRange", {
     default: {
@@ -47,6 +58,8 @@ const accountSelectOptions = computed(() => props.accounts.map((account) => ({
     value: account.id,
     color: account.color,
 })));
+
+const loading = ref<boolean>(false);
 
 const df = new DateFormatter("en-GB", {
     dateStyle: "medium",
