@@ -6,8 +6,9 @@ export const ACCOUNTS_UPDATE = `${API_ACCOUNTS}/update`;
 export const ACCOUNTS_DELETE = `${API_ACCOUNTS}/delete`;
 
 // Categories
-export const CATEGORIES_FETCH = "/api/categories/fetch";
-export const CATEGORIES_EXPENSE_FETCH = "/api/categories/expenses";
+export const API_CATEGORIES = "/api/categories";
+export const CATEGORIES_FETCH = `${API_CATEGORIES}/fetch`;
+export const CATEGORIES_EXPENSE_FETCH = `${API_CATEGORIES}/expenses`;
 
 // Transactions
 export const API_TRANSACTIONS = "/api/transactions";

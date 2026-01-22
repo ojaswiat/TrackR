@@ -26,7 +26,7 @@ const props = defineProps({
     },
 });
 
-const { data: transactionsResponse } = await useAsyncData(
+const { data: transactionsResponse, refresh: refreshTransactions } = await useAsyncData(
     () => `transactions-${props.selectedAccount}`, // Dynamic key for caching
     () => $fetch(TRANSACTIONS_FETCH, {
         method: "GET",
@@ -39,5 +39,9 @@ const { data: transactionsResponse } = await useAsyncData(
 
 const transactions = computed(() => {
     return (transactionsResponse.value?.data?.transactions?.slice(0, 5) || []) as TTransaction[];
+});
+
+onMounted(async () => {
+    await refreshTransactions();
 });
 </script>
