@@ -22,7 +22,7 @@
                 Features
             </h2>
             <ul>
-                <li>Manage up to 5 separate accounts</li>
+                <li>Manage up to {{ APP_CONFIG.MAX_ACCOUNTS_PER_USER }} separate accounts</li>
                 <li>Track income and expenses with detailed categorization</li>
                 <li>Visualize your financial data with interactive charts</li>
                 <li>Filter and analyze transactions by date, account, and category</li>
@@ -42,6 +42,8 @@
 </template>
 
 <script setup lang="ts">
+import { APP_CONFIG } from "~~/shared/constants/config.const";
+
 useHead({
     title: "About",
 });

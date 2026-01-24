@@ -63,7 +63,9 @@
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
 import { find } from "lodash-es";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
+import useUserStore from "~/stores/UserStore";
 
 const props = defineProps({
     selectedAccountName: {
@@ -75,6 +77,9 @@ const props = defineProps({
         required: true,
     },
 });
+const userStore = useUserStore();
+const { currency } = storeToRefs(userStore);
+
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
@@ -144,7 +149,7 @@ const columns: TableColumn<TTransactionUI>[] = [
                 },
                 new Intl.NumberFormat("en-US", {
                     style: "currency",
-                    currency: "GBP",
+                    currency: currency.value?.id ?? APP_CONFIG.DEFAULT_CURRENCY,
                 }).format(amount),
             );
         },

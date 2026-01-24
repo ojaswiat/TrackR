@@ -1,6 +1,7 @@
 import type { TTransactionType } from "~~/shared/constants/enums";
 import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { db } from "~~/server/utils/db";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { accounts, transactions } from "~~/shared/db/schema";
 import { getCategoryStatistics } from "./category.handler";
@@ -105,7 +106,7 @@ export async function getDashboardData(userId: string, filters?: { startDate?: D
         .from(transactions)
         .where(eq(transactions.user_id, userId))
         .orderBy(desc(transactions.transaction_date))
-        .limit(5);
+        .limit(APP_CONFIG.MAX_RECENT_TRANSACTIONS);
 
     const categoryStats = await getCategoryStatistics(userId, filters?.accountIds, { startDate: startOfPeriod, endDate: endOfPeriod });
 

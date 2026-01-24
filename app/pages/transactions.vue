@@ -26,6 +26,7 @@ import type { TTransactionType } from "~~/shared/constants/enums";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { find, map, reduce } from "lodash-es";
 import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 
 definePageMeta({
     title: "Transactions",
@@ -42,7 +43,7 @@ const selectedCategory = ref<string>();
 const selectedType = ref<TTransactionType>();
 
 const selectedDateRange = ref({
-    start: today(getLocalTimeZone()).subtract({ months: 1 }),
+    start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
     end: today(getLocalTimeZone()),
 });
 

@@ -42,7 +42,7 @@
                     <FeatureCard
                         icon="i-lucide:wallet"
                         title="Multiple Accounts"
-                        description="Manage up to 5 accounts with custom colors and track balances separately"
+                        :description="`Manage up to ${APP_CONFIG.MAX_ACCOUNTS_PER_USER} accounts with custom colors and track balances separately`"
                     />
                     <FeatureCard
                         icon="i-lucide:trending-up"
@@ -94,6 +94,8 @@
 </template>
 
 <script setup lang="ts">
+import { APP_CONFIG } from "~~/shared/constants/config.const";
+
 useHead({
     title: "trackr. - Your Personal Finance Tracker",
 });

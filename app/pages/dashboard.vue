@@ -33,6 +33,7 @@
 <script setup lang="ts">
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { ACCOUNTS_FETCH, DASHBOARD_FETCH } from "~~/shared/constants/api.const";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 
 definePageMeta({
     title: "Dashboard",
@@ -49,7 +50,7 @@ const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
 const selectedAccount = ref<string>();
 
 const selectedDateRange = ref({
-    start: today(getLocalTimeZone()).subtract({ months: 1 }),
+    start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
     end: today(getLocalTimeZone()),
 });
 

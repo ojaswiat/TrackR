@@ -30,12 +30,21 @@
             v-model:selected-date-range="selectedDateRange"
             :loading="props.loading"
         />
+        <UButton
+            icon="lucide:x"
+            size="sm"
+            variant="ghost"
+            :loading="props.loading"
+            @click="reset">
+            Reset
+        </UButton>
     </div>
 </template>
 
 <script setup lang="ts">
 import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
-import { filter, map } from "lodash-es";
+import { map } from "lodash-es";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 
 const props = defineProps({
     accounts: {
@@ -53,7 +62,7 @@ const emits = defineEmits(["refresh"]);
 const selectedAccount = defineModel<string>("selectedAccount");
 const selectedDateRange = defineModel<any>("selectedDateRange", {
     default: {
-        start: today(getLocalTimeZone()).subtract({ months: 1 }),
+        start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
         end: today(getLocalTimeZone()),
     },
 });
@@ -73,4 +82,12 @@ const accountSelectOptions = computed(() => {
 const df = new DateFormatter("en-GB", {
     dateStyle: "medium",
 });
+
+function reset() {
+    selectedAccount.value = undefined;
+    selectedDateRange.value = {
+        start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
+        end: today(getLocalTimeZone()),
+    };
+}
 </script>

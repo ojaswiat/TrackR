@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 
 const props = defineProps({
     loading: {
@@ -48,7 +49,7 @@ const df = new DateFormatter("en-GB", {
 
 const selectedDateRange = defineModel("selectedDateRange", {
     default: {
-        start: today(getLocalTimeZone()).subtract({ months: 1 }),
+        start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
         end: today(getLocalTimeZone()),
     },
 });

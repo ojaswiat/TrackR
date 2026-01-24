@@ -5,6 +5,7 @@ import {
     getAllTransactionsForUser,
 } from "~~/server/handlers/transaction.handler";
 import { isDev } from "~~/server/utils/api.utils";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
 export default defineEventHandler(async (event) => {
@@ -16,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
         const query = getQuery(event);
 
-        const limit = query.limit ? Number(query.limit) : 20;
+        const limit = query.limit ? Number(query.limit) : APP_CONFIG.TRANSACTIONS_PER_PAGE;
         const cursor = query.cursor ? String(query.cursor) : undefined;
 
         const account_id = query.account_id ? String(query.account_id) : undefined;

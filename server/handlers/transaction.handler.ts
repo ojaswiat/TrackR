@@ -1,6 +1,7 @@
 import type { TTransaction } from "~~/shared/types/entity.types";
 import { and, desc, eq, gte, lt, lte } from "drizzle-orm";
 import { db } from "~~/server/utils/db";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { transactions } from "~~/shared/db/schema";
 
 export async function checkTransactionExists(transactionId: string): Promise<boolean> {
@@ -59,7 +60,7 @@ export async function getAllTransactionsForUser(
     },
     options?: { limit?: number; cursor?: string },
 ): Promise<{ data: TTransaction[]; meta: { next_cursor: string | null; has_more: boolean } }> {
-    const limit = options?.limit ?? 20;
+    const limit = options?.limit ?? APP_CONFIG.TRANSACTIONS_PER_PAGE;
     const cursor = options?.cursor;
 
     const conditions = [eq(transactions.user_id, userId)];

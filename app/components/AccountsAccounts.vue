@@ -9,7 +9,7 @@
             />
         </template>
         <UCard
-            v-if="props.accounts.length < 5"
+            v-if="props.accounts.length < APP_CONFIG.MAX_ACCOUNTS_PER_USER"
             as="button"
             class="accounts-card-hover add-card w-60 h-[136px] flex-shrink-0 cursor-pointer"
             :ui="{
@@ -31,13 +31,14 @@
         <p
             v-else
             class="text-muted w-full">
-            You can only add 5 accounts at a time
+            You can only add {{ APP_CONFIG.MAX_ACCOUNTS_PER_USER }} accounts at a time
         </p>
     </div>
 </template>
 
 <script setup lang="ts">
 import { isEmpty } from "lodash-es";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 
 const props = defineProps({
     accounts: {

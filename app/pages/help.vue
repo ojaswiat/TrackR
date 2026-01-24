@@ -8,6 +8,8 @@
 </template>
 
 <script setup lang="ts">
+import { APP_CONFIG } from "~~/shared/constants/config.const";
+
 definePageMeta({
     title: "Help",
     description: "Here you can find information on how to use trackr.",
@@ -33,7 +35,7 @@ const faqs = [
     },
     {
         label: "How many accounts can I create?",
-        content: "You can create up to 5 accounts. This limit helps keep your finances organized and manageable.",
+        content: `You can create up to ${APP_CONFIG.MAX_ACCOUNTS_PER_USER} accounts. This limit helps keep your finances organized and manageable.`,
     },
     {
         label: "How do I change my currency?",

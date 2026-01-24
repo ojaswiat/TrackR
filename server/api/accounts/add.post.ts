@@ -2,6 +2,7 @@ import type { TUser } from "~~/shared/types/entity.types";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 import { addAccountForUser, checkCanUserAddAccount } from "~~/server/handlers/account.handler";
 import { isDev } from "~~/server/utils/api.utils";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 import { ZAddAccountSchema } from "~~/shared/schemas/zod.schema";
 
@@ -28,7 +29,7 @@ export default defineEventHandler(async (event) => {
             throw createError({
                 statusCode: SERVER_STATUS_CODES.BAD_REQUEST,
                 statusMessage: STATUS_CODE_MESSAGE_MAP[SERVER_STATUS_CODES.BAD_REQUEST],
-                message: "User can only have 5 accounts!",
+                message: `User can only have ${APP_CONFIG.MAX_ACCOUNTS_PER_USER} accounts!`,
             });
         }
 

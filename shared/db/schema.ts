@@ -9,6 +9,7 @@ import {
     uuid,
     varchar,
 } from "drizzle-orm/pg-core";
+import { APP_CONFIG } from "../constants/config.const";
 
 export const users = pgTable("users", {
     id: uuid("id").primaryKey().default(sql`gen_random_uuid()`).unique(),
@@ -16,7 +17,7 @@ export const users = pgTable("users", {
     last_name: varchar({ length: 30 }),
     email: varchar().notNull().unique(),
 
-    currency: varchar({ length: 3 }).notNull().default("GBP"),
+    currency: varchar({ length: 3 }).notNull().default(APP_CONFIG.DEFAULT_CURRENCY),
 
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at")
@@ -88,6 +89,8 @@ export const transactions = pgTable("transactions", {
     index("transaction_user_id_idx").on(table.user_id),
     index("transaction_type_idx").on(table.type),
     index("transaction_transaction_date_idx").on(table.transaction_date),
+    index("transaction_user_date_idx").on(table.user_id, table.transaction_date),
+    index("transaction_account_date_idx").on(table.account_id, table.transaction_date),
     check(
         "transactions_type_valid", // constraint name
         sql`${table.type} IN (0, 1)`, // condition

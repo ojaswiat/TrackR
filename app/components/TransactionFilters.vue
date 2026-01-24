@@ -47,13 +47,22 @@
             v-model:selected-date-range="selectedDateRange"
             :loading="props.loading"
         />
+        <UButton
+            icon="lucide:x"
+            size="sm"
+            variant="ghost"
+            :loading="props.loading"
+            @click="reset">
+            Reset
+        </UButton>
     </div>
 </template>
 
 <script setup lang="ts">
 import type { TTransactionType } from "~~/shared/constants/enums";
-import { DateFormatter, getLocalTimeZone } from "@internationalized/date";
+import { DateFormatter, getLocalTimeZone, today } from "@internationalized/date";
 import { filter, map } from "lodash-es";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { CATEGORY_TYPE, TRANSACTION_TYPE } from "~~/shared/constants/enums";
 
 const props = defineProps({
@@ -122,4 +131,14 @@ const typeSelectOptions = ref([
 const df = new DateFormatter("en-GB", {
     dateStyle: "medium",
 });
+
+function reset() {
+    selectedAccount.value = undefined;
+    selectedCategory.value = undefined;
+    selectedType.value = undefined;
+    selectedDateRange.value = {
+        start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
+        end: today(getLocalTimeZone()),
+    };
+}
 </script>

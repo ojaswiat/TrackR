@@ -2,6 +2,7 @@ import type { TAccount } from "~~/shared/types/entity.types";
 import { and, eq, sql, sum } from "drizzle-orm";
 import { map, reduce } from "lodash-es";
 import { db } from "~~/server/utils/db";
+import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { accounts, transactions } from "~~/shared/db/schema";
 
@@ -97,7 +98,7 @@ export async function checkCanUserAddAccount(userId: string): Promise<boolean> {
         .from(accounts)
         .where(eq(accounts.user_id, userId));
 
-    return Number(existingAccountsCount[0]?.count ?? 0) < 5;
+    return Number(existingAccountsCount[0]?.count ?? 0) < APP_CONFIG.MAX_ACCOUNTS_PER_USER;
 }
 
 // create a function to add account for a user
