@@ -69,7 +69,7 @@ import type z from "zod";
 import type { TUserProfile } from "~~/shared/schemas/zod.schema";
 import { cloneDeep, reduce } from "lodash-es";
 import currencies from "~~/data/currencies.json";
-import { USER_FETCH, USER_UPDATE } from "~~/shared/constants/api.const";
+import { USER_UPDATE } from "~~/shared/constants/api.const";
 import { ZUserProfileSchema } from "~~/shared/schemas/zod.schema";
 
 const props = defineProps({

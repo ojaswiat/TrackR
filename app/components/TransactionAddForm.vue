@@ -161,8 +161,7 @@ import type { z } from "zod";
 import { CalendarDate, getLocalTimeZone, parseDate, today } from "@internationalized/date";
 import { cloneDeep, filter, map } from "lodash-es";
 import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
-import { DEFAULT_ALL_CATEGORY_ID } from "~~/shared/constants/data.const";
-import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
+import { CATEGORY_TYPE, TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { ZAddTransactionSchema } from "~~/shared/schemas/zod.schema";
 
 const props = defineProps({
@@ -246,9 +245,9 @@ const accountOptions = computed(() => {
 });
 
 const categoryOptions = computed(() => {
-    const noAllAccountCategory = filter(categories.value, (category) => category.id !== DEFAULT_ALL_CATEGORY_ID);
+    const noIncomeCategory = filter(categories.value, (category) => category.type !== CATEGORY_TYPE.INCOME);
 
-    const items = map(noAllAccountCategory, (category) => {
+    const items = map(noIncomeCategory, (category) => {
         return {
             label: category.name,
             value: category.id,

@@ -18,17 +18,13 @@
             :selected-date-range="selectedDateRange"
             :transactions="transactions"
         />
-        <div
-            ref="sentinel"
-            class="h-10 w-full"></div>
     </div>
 </template>
 
 <script setup lang="ts">
-import type { CalendarDate } from "@internationalized/date";
 import type { TTransactionType } from "~~/shared/constants/enums";
 import { getLocalTimeZone, today } from "@internationalized/date";
-import { filter, find, map, reduce } from "lodash-es";
+import { find, map, reduce } from "lodash-es";
 import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
 import { DEFAULT_ALL_ACCOUNT_ID } from "~~/shared/constants/data.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
@@ -65,7 +61,6 @@ const { data: transactionsResponse, pending: loading, refresh: refreshTransactio
             type: selectedType.value,
             startDate: selectedDateRange.value.start.toString(),
             endDate: selectedDateRange.value.end.toString(),
-            limit: 20,
         },
     }),
     {
@@ -74,15 +69,11 @@ const { data: transactionsResponse, pending: loading, refresh: refreshTransactio
 );
 
 const categories = computed(() => {
-    const categoriesWithoutIncome = filter(
-        categoryResponse.value?.data?.categories,
-        (category) => category.id !== "cat_001",
-    );
-    return categoriesWithoutIncome as TCategory[];
+    return categoryResponse.value?.data?.categories ?? [];
 });
 
 const accounts = computed(() => {
-    return accountsResponse.value?.data?.accounts || [];
+    return accountsResponse.value?.data?.accounts ?? [];
 });
 
 const categoriesMap = computed<Record<string, TCategory>>(() => {
@@ -111,12 +102,7 @@ const selectedAccountName = computed(() => {
     return find(accounts.value, (account) => account.id === (selectedAccount.value ?? DEFAULT_ALL_ACCOUNT_ID))?.name ?? "";
 });
 
-const transactions = ref<TTransactionUI[]>([]);
-const cursor = ref<string | undefined>(undefined);
-const hasMore = ref(true);
-const sentinel = ref<HTMLElement | null>(null);
-
-function mapTransactions(rawTransactions: any[]) {
+function mapTransactions(rawTransactions: TTransaction[]) {
     return map(rawTransactions, (transaction) => {
         const transactionCategory = categoriesMap.value[transaction.category_id];
         const transactionAccount = accountsMap.value[transaction.account_id];
@@ -131,61 +117,11 @@ function mapTransactions(rawTransactions: any[]) {
     }) as TTransactionUI[];
 }
 
-watch(transactionsResponse, (newVal) => {
-    if (newVal?.data) {
-        transactions.value = mapTransactions(newVal.data.transactions);
-        cursor.value = newVal.data.meta.next_cursor || undefined;
-        hasMore.value = newVal.data.meta.has_more;
-    }
-}, { immediate: true });
-
-async function loadMore() {
-    if (!cursor.value || !hasMore.value || loading.value) {
-        return;
-    }
-
-    try {
-        const res = await $fetch(TRANSACTIONS_FETCH, {
-            method: "GET",
-            query: {
-                account_id: selectedAccount.value === DEFAULT_ALL_ACCOUNT_ID ? undefined : selectedAccount.value,
-                category_id: selectedCategory.value,
-                type: selectedType.value,
-                startDate: selectedDateRange.value.start.toString(),
-                endDate: selectedDateRange.value.end.toString(),
-                limit: 20,
-                cursor: cursor.value,
-            },
-        });
-
-        if (res.data) {
-            const newTransactions = mapTransactions(res.data.transactions);
-            transactions.value.push(...newTransactions);
-            cursor.value = res.data.meta.next_cursor || undefined;
-            hasMore.value = res.data.meta.has_more;
-        }
-    } catch (e) {
-        console.error("Failed to load more transactions", e);
-    }
-}
-
-let observer: IntersectionObserver | null = null;
-
-onMounted(async () => {
-    // Initial refresh is handled by useAsyncData immediate
-    observer = new IntersectionObserver(([entry]) => {
-        if (entry && entry.isIntersecting) {
-            loadMore();
-        }
-    });
-    if (sentinel.value) {
-        observer.observe(sentinel.value);
-    }
+const transactions = computed (() => {
+    return mapTransactions((transactionsResponse.value as TAPIResponseSuccess<{ transactions: TTransaction[] }>)?.data.transactions);
 });
 
-onUnmounted(() => {
-    if (observer) {
-        observer.disconnect();
-    }
+onMounted(async () => {
+    await refreshTransactions();
 });
 </script>
