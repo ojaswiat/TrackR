@@ -22,6 +22,7 @@
                 </p>
             </div>
         </div>
+        <!-- <ClientOnly> -->
         <div>
             <p
                 class="font-semibold"
@@ -29,25 +30,21 @@
                     'text-primary-500': props.transaction.type === TRANSACTION_TYPE.INCOME,
                     'text-error-500': props.transaction.type === TRANSACTION_TYPE.EXPENSE,
                 }">
-                {{ props.transaction.type === TRANSACTION_TYPE.INCOME ? "+" : "-" }}{{ currency }}{{ props.transaction.amount }}
+                {{ props.transaction.type === TRANSACTION_TYPE.INCOME ? "+" : "-" }}{{ useCurrencyFormatter(props.transaction.amount) }}
             </p>
         </div>
+        <!-- </ClientOnly> -->
     </div>
 </template>
 
 <script setup lang="ts">
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
+import useUserStore from "~/stores/UserStore";
 
 const props = defineProps({
     transaction: {
         type: Object as PropType<TTransaction>,
         required: true,
     },
-});
-
-// TODO: Fetch default currency from user store
-const currency = computed(() => {
-    // return useUserStore().user?.currency || "£";
-    return "£";
 });
 </script>

@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ formatCurrency(props.summary.total_income) }}
+                    {{ useCurrencyFormatter(props.summary.total_income) }}
                 </p>
             </div>
         </UCard>
@@ -33,7 +33,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ formatCurrency(props.summary.total_expense) }}
+                    {{ useCurrencyFormatter(props.summary.total_expense) }}
                 </p>
             </div>
         </UCard>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
                 <p class="text-2xl font-bold text-neutral-800">
-                    {{ formatCurrency(props.summary.total_income - props.summary.total_expense) }}
+                    {{ useCurrencyFormatter(props.summary.total_income - props.summary.total_expense) }}
                 </p>
             </div>
         </UCard>

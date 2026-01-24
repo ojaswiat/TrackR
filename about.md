@@ -40,7 +40,7 @@ Contains the Vue.js frontend application logic and UI.
 - **`stores/`**: Pinia stores.
     - `UserStore.ts`: Manages user locale and preferences.
 - **`utils/`**: Frontend utility functions.
-    - `formatting.ts`: `useDateTimeFormatter`, `formatCurrency`.
+    - `formatting.ts`: `useDateTimeFormatter`, `useCurrencyFormatter`.
     - `dev.ts`: Development helpers.
 - **`types/`**: UI-specific types (`ui.types.ts`).
 - **`constants/`**: UI constants (`route.const.ts`, `ui.const.ts`).
@@ -190,7 +190,7 @@ TypeScript interfaces mirroring the database entities, often extending them with
 ## Utils
 
 ### Frontend (`app/utils/`)
-- **`formatCurrency(amount)`**: Formats numbers to currency strings (e.g., "£1.2k", "£500.00") with suffix support (K, M, B, T).
+- **`useCurrencyFormatter(amount)`**: Formats numbers to currency strings (e.g., "£1.2k", "£500.00") with suffix support (K, M, B, T).
 - **`useDateTimeFormatter(isoString)`**: Converts ISO dates to readable formats (`DD MMM, YYYY` and `HH:MM AM/PM`).
 
 ### Server (`server/utils/`)
