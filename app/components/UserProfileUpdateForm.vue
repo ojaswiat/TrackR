@@ -83,16 +83,6 @@ const props = defineProps({
     },
 });
 
-definePageMeta({
-    title: "Profile",
-    description: "Manage your profile settings",
-    layout: "app",
-});
-
-useHead({
-    title: "Profile",
-});
-
 const toast = useToast();
 const saving = ref(false);
 const deleting = ref(false);
