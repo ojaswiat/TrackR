@@ -1,10 +1,5 @@
-Todo:
-
-1. Create a demo user with transactions and accounts for demo in the Supabase.
-2. Demo user can't be delete, it should throw error from server side that demo user can't be deleted, so that the UI can display the toast with the message "Demo user can't be deleted".
-3. Filters are not working on the transaction page.
-4. Create a clear all / reset filters button - so that we don't have to show all accounts or all categories everywhere
-5. Create unfinished pages.
-6. Publish the app to google console by getting a domain name - don't do SEO
-7. Pagination and infinite scroll from client and server
-8. Find out why API call is not working on SSR - why do we need explicit onMounted()?
+1. Pagination on transactions API with infinite scroll.
+2. Look for final gaps.
+3. Make the UI responsive.
+4. Deploy a demo user and complete the demo user login flow on code and Supabase.
+5. Deploy the app to vercel and get a working link.

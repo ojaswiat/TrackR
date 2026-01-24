@@ -1,21 +1,43 @@
 <template>
-    <div class="flex flex-col gap-4 justify-center items-center px-4 h-full w-full">
-        <UButton
-            icon="i-simple-icons-github"
-            color="neutral"
-            class="flex justify-center cursor-pointer"
-            variant="outline"
-            @click="signInWithGitHub">
-            Sign in with GitHub
-        </UButton>
-        <UButton
-            icon="i-simple-icons-google"
-            color="neutral"
-            class="flex justify-center cursor-pointer"
-            variant="outline"
-            @click="signInWithGoogle">
-            Sign in with Google
-        </UButton>
+    <div class="flex flex-col gap-8 justify-center items-center px-4 h-full w-full">
+        <div class="flex flex-col gap-4 items-center">
+            <p class="text-2xl font-semibold">
+                Check out a demo account
+            </p>
+            <UButton
+                icon="i-lucide-circle-user"
+                color="neutral"
+                class="flex justify-center cursor-pointer"
+                variant="outline"
+                @click="signInDemoUser">
+                Sign in as Demo User
+            </UButton>
+        </div>
+
+        <div class="flex flex-col gap-4 items-center">
+            <p class="text-2xl font-semibold">
+                or try the app yourself!
+            </p>
+            <UButton
+                icon="i-simple-icons-github"
+                color="neutral"
+                class="flex justify-center cursor-pointer"
+                variant="outline"
+                @click="signInWithGitHub">
+                Sign in with GitHub
+            </UButton>
+            <UButton
+                icon="i-simple-icons-google"
+                color="neutral"
+                class="flex justify-center cursor-pointer"
+                variant="outline"
+                @click="signInWithGoogle">
+                Sign in with Google
+            </UButton>
+            <p class="text-muted">
+                The Google Sign In is only available for test users. Please use the GitHub Sign In instead.
+            </p>
+        </div>
 
         <p class="text-muted text-sm">
             By Signing in, you agree to our <NuxtLink
@@ -60,6 +82,8 @@ async function signInWithGoogle() {
         console.error("Error signing in:", error);
     }
 }
+
+async function signInDemoUser() {}
 
 watch(user, async () => {
     if (user.value) {
