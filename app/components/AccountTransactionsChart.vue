@@ -1,17 +1,19 @@
 <template>
-    <LineChart
-        :data="chartData"
-        :height="280"
-        y-label="Sales"
-        :x-num-ticks="4"
-        :y-num-ticks="4"
-        :categories="categories"
-        :x-formatter="xFormatter"
-        :y-grid-line="true"
-        :curve-type="CurveType.Linear"
-        :legend-position="LegendPosition.TopRight"
-        :hide-legend="false"
-    />
+    <ClientOnly>
+        <LineChart
+            :data="chartData"
+            :height="280"
+            y-label="Sales"
+            :x-num-ticks="4"
+            :y-num-ticks="4"
+            :categories="categories"
+            :x-formatter="xFormatter"
+            :y-grid-line="true"
+            :curve-type="CurveType.Linear"
+            :legend-position="LegendPosition.TopRight"
+            :hide-legend="false"
+        />
+    </ClientOnly>
 </template>
 
 <script lang="ts" setup>

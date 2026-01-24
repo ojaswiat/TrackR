@@ -1,6 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
+    // build: {
+    //     transpile: ["to-px", "@unovis/ts", "@unovis/vue"],
+    // },
+
     css: ["~/assets/css/main.css"],
 
     devtools: {
@@ -39,9 +43,26 @@ export default defineNuxtConfig({
         redirectOptions: {
             login: "/signin",
             callback: "/confirm",
-            exclude: ["/", "/about"], // Add public pages here
+            exclude: [
+                "/",
+                "/about",
+                "/terms",
+                "/privacy",
+            ], // Add public pages here
         },
     },
 
     // ssr: false,
+    nitro: {
+        experimental: {
+            openAPI: false,
+        },
+    },
+
+    vite: {
+    // plugins: [tailwindcss()],
+        ssr: {
+            noExternal: ["to-px"],
+        },
+    },
 });
