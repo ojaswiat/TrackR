@@ -8,11 +8,15 @@
                 Showing transactions for {{ props.selectedAccountName }}
             </p>
 
-            <div class="h-[calc(100vh-24rem)] overflow-y-scroll mt-4">
+            <div
+                ref="table"
+                class="h-[calc(100vh-26rem)] overflow-y-scroll mt-4">
                 <UTable
                     :columns="columns"
                     :column-visibility="columnVisibility"
                     :data="props.transactions"
+                    :loading="props.loading"
+                    sticky
                     :ui="{
                         root: 'px-0 overflow-auto',
                     }"
@@ -62,6 +66,7 @@
 <script setup lang="ts">
 import type { TableColumn } from "@nuxt/ui";
 import type { Row } from "@tanstack/vue-table";
+import { useInfiniteScroll } from "@vueuse/core";
 import { find } from "lodash-es";
 import { APP_CONFIG } from "~~/shared/constants/config.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
@@ -76,10 +81,22 @@ const props = defineProps({
         type: Array as PropType<TTransactionUI[]>,
         required: true,
     },
+    loading: {
+        type: Boolean,
+        required: true,
+    },
+    hasMoreData: {
+        type: Boolean,
+        required: true,
+    },
 });
+
+const emits = defineEmits(["loadMore"]);
+
 const userStore = useUserStore();
 const { currency } = storeToRefs(userStore);
 
+const table = useTemplateRef("table");
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
@@ -236,4 +253,20 @@ function onTransactionDelete(id: string) {
     selectedTransaction.value = find(props.transactions, (transaction) => transaction.id === id);
     showDeleteTransactionModal.value = true;
 }
+
+onMounted(() => {
+    useInfiniteScroll(
+        table.value,
+        () => {
+            emits("loadMore");
+        },
+        {
+            distance: 200,
+            canLoadMore: () => {
+                // Only load if not currently loading AND there's more data
+                return !props.loading && props.hasMoreData;
+            },
+        },
+    );
+});
 </script>

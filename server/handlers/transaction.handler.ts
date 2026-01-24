@@ -68,8 +68,6 @@ export async function getAllTransactionsForUser(
 
     if (filters?.account_id) {
         conditions.push(eq(transactions.account_id, filters.account_id));
-    } else {
-        conditions.push(eq(transactions.user_id, userId));
     }
 
     if (filters?.startDate) {
@@ -92,12 +90,13 @@ export async function getAllTransactionsForUser(
         conditions.push(lt(transactions.transaction_date, new Date(cursor)));
     }
 
+    // Fetch limit + 1 to determine if there are more results
     const result = await db
         .select()
         .from(transactions)
         .where(and(...conditions))
         .orderBy(desc(transactions.transaction_date))
-        .limit(limit);
+        .limit(limit + 1);
 
     const hasMore = result.length > limit;
     const data = hasMore ? result.slice(0, limit) : result;

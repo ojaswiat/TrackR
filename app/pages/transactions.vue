@@ -8,7 +8,7 @@
             class="px-4"
             :accounts="accounts"
             :categories="categories"
-            :loading="loading"
+            :loading="status === 'pending'"
             @refresh="() => refreshTransactions()"
         />
 
@@ -17,6 +17,9 @@
             :selected-account-name="selectedAccountName"
             :selected-date-range="selectedDateRange"
             :transactions="transactions"
+            :loading="status === 'pending'"
+            :has-more-data="hasMoreData"
+            @load-more="loadMoreTransactions"
         />
     </div>
 </template>
@@ -42,6 +45,8 @@ const selectedAccount = ref<string>();
 const selectedCategory = ref<string>();
 const selectedType = ref<TTransactionType>();
 
+const hasMoreData = ref<boolean>(true);
+
 const selectedDateRange = ref({
     start: today(getLocalTimeZone()).subtract({ months: APP_CONFIG.DATE_RANGE_DEFAULT_MONTHS }),
     end: today(getLocalTimeZone()),
@@ -50,23 +55,34 @@ const selectedDateRange = ref({
 const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
 const { data: categoryResponse } = await useFetch(CATEGORIES_FETCH);
 
-const { data: transactionsResponse, pending: loading, refresh: refreshTransactions } = await useAsyncData(
-    () => `transactions-${selectedAccount.value}-${selectedCategory.value}-${selectedType.value}-${selectedDateRange.value.start}-${selectedDateRange.value.end}`,
-    () => $fetch(TRANSACTIONS_FETCH, {
-        method: "GET",
-        query: {
-            account_id: selectedAccount.value,
-            category_id: selectedCategory.value,
-            type: selectedType.value,
-            startDate: selectedDateRange.value.start.toString(),
-            endDate: selectedDateRange.value.end.toString(),
-        },
-    }),
+const cursor = ref<string | null>(null);
+const accumulatedTransactions = ref<TTransaction[]>([]);
+
+const { data: transactionsResponse, status, execute: fetchMoreTransactions } = useFetch(
+    TRANSACTIONS_FETCH,
     {
-        watch: [selectedAccount, selectedCategory, selectedType, selectedDateRange],
+        key: "transactions-infinite-scroll",
+        query: computed(() => {
+            const baseQuery = {
+                account_id: selectedAccount.value,
+                category_id: selectedCategory.value,
+                type: selectedType.value,
+                startDate: selectedDateRange.value.start.toString(),
+                endDate: selectedDateRange.value.end.toString(),
+                limit: APP_CONFIG.TRANSACTIONS_PER_PAGE,
+            };
+
+            // Only add cursor if it exists
+            if (cursor.value) {
+                return { ...baseQuery, cursor: cursor.value };
+            }
+
+            return baseQuery;
+        }),
+        immediate: false, // Don't fetch automatically
+        watch: false, // Disable automatic watching
     },
 );
-
 const categories = computed(() => {
     return categoryResponse.value?.data?.categories ?? [];
 });
@@ -118,11 +134,50 @@ function mapTransactions(rawTransactions: TTransaction[]) {
     }) as TTransactionUI[];
 }
 
-const transactions = computed (() => {
-    return mapTransactions((transactionsResponse.value as TAPIResponseSuccess<{ transactions: TTransaction[] }>)?.data.transactions);
+const transactions = computed(() => {
+    return mapTransactions(accumulatedTransactions.value);
 });
 
-onMounted(async () => {
-    await refreshTransactions();
+// Function to reset and refresh all transactions
+async function refreshTransactions() {
+    cursor.value = null;
+    accumulatedTransactions.value = [];
+    hasMoreData.value = true;
+    await fetchMoreTransactions();
+}
+
+async function loadMoreTransactions() {
+    if (status.value === "pending" || !hasMoreData.value) {
+        return; // Don't fetch if already loading or no more data
+    }
+
+    await fetchMoreTransactions();
+}
+
+onMounted(() => {
+    refreshTransactions();
 });
+
+// Watch for new data and append to accumulated array
+watch(transactionsResponse, (newResponse) => {
+    if (newResponse?.data?.transactions) {
+        accumulatedTransactions.value = [
+            ...accumulatedTransactions.value,
+            ...newResponse.data.transactions,
+        ];
+
+        // Check if there's more data
+        if (newResponse.data.meta?.next_cursor) {
+            cursor.value = newResponse.data.meta.next_cursor;
+            hasMoreData.value = true;
+        } else {
+            hasMoreData.value = false; // No more data to load
+        }
+    }
+});
+
+// Watch filters and reset when they change
+watch([selectedAccount, selectedCategory, selectedType, selectedDateRange], () => {
+    refreshTransactions();
+}, { deep: true });
 </script>
