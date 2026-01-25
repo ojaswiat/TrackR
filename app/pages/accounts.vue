@@ -5,6 +5,7 @@
                 class="w-fit"
                 icon="i-lucide:plus"
                 size="sm"
+                :disabled="!!user.is_demo"
                 @click="showAddAccountModal = true">
                 Add Account
             </UButton>
@@ -78,6 +79,7 @@
 <script setup lang="ts">
 import { find } from "lodash-es";
 import { ACCOUNTS_FETCH } from "~~/shared/constants/api.const";
+import useUserStore from "~/stores/UserStore";
 
 definePageMeta({
     title: "Accounts",
@@ -88,6 +90,9 @@ definePageMeta({
 useHead({
     title: "Accounts",
 });
+
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 
 const {
     data: accountsAPIResponse,

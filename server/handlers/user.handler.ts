@@ -20,6 +20,7 @@ export async function getUser(userId: string): Promise<TUser> {
         last_name: user.last_name || "",
         email: user.email,
         currency: user.currency,
+        is_demo: user.is_demo,
     };
 }
 

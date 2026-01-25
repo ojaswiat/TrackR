@@ -1,5 +1,19 @@
 import type { TServerStatusCode } from "~~/shared/constants/enums";
-import { API_ACCOUNTS, API_TRANSACTIONS, API_USER, CATEGORIES_FETCH, DASHBOARD_FETCH } from "~~/shared/constants/api.const";
+import {
+    ACCOUNTS_ADD,
+    ACCOUNTS_DELETE,
+    ACCOUNTS_UPDATE,
+    API_ACCOUNTS,
+    API_TRANSACTIONS,
+    API_USER,
+    CATEGORIES_FETCH,
+    DASHBOARD_FETCH,
+    TRANSACTIONS_ADD,
+    TRANSACTIONS_DELETE,
+    TRANSACTIONS_UPDATE,
+    USER_DELETE,
+    USER_UPDATE,
+} from "~~/shared/constants/api.const";
 import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
 
 export const STATUS_CODE_MESSAGE_MAP: Record<TServerStatusCode, string> = {
@@ -18,4 +32,15 @@ export const PROTECTED_ROUTES = [
     API_TRANSACTIONS,
     API_USER,
     DASHBOARD_FETCH,
+];
+
+export const DEMO_PROTECTED_ROUTES = [
+    ACCOUNTS_ADD,
+    ACCOUNTS_UPDATE,
+    ACCOUNTS_DELETE,
+    TRANSACTIONS_ADD,
+    TRANSACTIONS_UPDATE,
+    TRANSACTIONS_DELETE,
+    USER_UPDATE,
+    USER_DELETE,
 ];

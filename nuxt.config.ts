@@ -1,3 +1,5 @@
+import process from "node:process";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
@@ -53,16 +55,15 @@ export default defineNuxtConfig({
     },
 
     // ssr: false,
-    nitro: {
-        experimental: {
-            openAPI: false,
-        },
-    },
-
     vite: {
     // plugins: [tailwindcss()],
         ssr: {
             noExternal: ["to-px"],
         },
+    },
+
+    runtimeConfig: {
+        demoUserEmail: process.env.DEMO_ACCOUNT_EMAIL,
+        demoUserPassword: process.env.DEMO_ACCOUNT_PASSWORD,
     },
 });

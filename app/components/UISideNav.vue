@@ -14,6 +14,7 @@
             class="mx-8 hover:-translate-y-1 transition-all duration-200 ease-in-out cursor-pointer"
             icon="i-lucide:plus"
             size="xl"
+            :disabled="!!user.is_demo"
             @click="emits('onAddTransaction')">
             New Transaction
         </UButton>
@@ -64,7 +65,12 @@
 </template>
 
 <script setup lang="ts">
+import useUserStore from "~/stores/UserStore";
+
 const emits = defineEmits(["onAddTransaction"]);
+
+const userStore = useUserStore();
+const { user } = storeToRefs(userStore);
 
 const UI_SIDE_NAV_LINKS = {
     [ROUTE_DASHBOARD]: {

@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+    boolean,
     check,
     index,
     integer,
@@ -18,6 +19,8 @@ export const users = pgTable("users", {
     email: varchar().notNull().unique(),
 
     currency: varchar({ length: 3 }).notNull().default(APP_CONFIG.DEFAULT_CURRENCY),
+
+    is_demo: boolean().default(false),
 
     created_at: timestamp("created_at").defaultNow().notNull(),
     updated_at: timestamp("updated_at")

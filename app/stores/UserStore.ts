@@ -17,6 +17,8 @@ const useUserStore = defineStore("UserStore", () => {
         value: string;
     }[]);
 
+    const toast = useToast();
+
     const user = ref<TUserProfile>({} as TUserProfile);
 
     const loading = ref<boolean>(false);
@@ -39,7 +41,6 @@ const useUserStore = defineStore("UserStore", () => {
 
             user.value = userResponse.data;
         } catch (e) {
-            const toast = useToast();
             const error = e as TAPIResponseError;
             const message = error.message || "Failed to delete account. Please try again.";
 
@@ -63,11 +64,9 @@ const useUserStore = defineStore("UserStore", () => {
                 body: formData,
             });
 
-            const toast = useToast();
             toast.add({ title: "Success", description: "Profile updated successfully!", color: "success" });
             user.value = cloneDeep(response as TAPIResponseSuccess<TUserProfile>).data;
         } catch (e) {
-            const toast = useToast();
             const error = e as TAPIResponseError;
             const message = error.message || "Something went wrong! Please try again later.";
             toast.add({ title: "Error", description: message, color: "error" });
@@ -85,7 +84,6 @@ const useUserStore = defineStore("UserStore", () => {
                 method: "DELETE",
             });
 
-            const toast = useToast();
             toast.add({
                 title: "Account Deleted",
                 description: "Your account has been deleted successfully.",
@@ -95,7 +93,6 @@ const useUserStore = defineStore("UserStore", () => {
             // Redirect to signin
             await navigateTo(ROUTE_SIGNIN);
         } catch (e) {
-            const toast = useToast();
             const error = e as TAPIResponseError;
             const message = error.message || "Failed to delete account. Please try again.";
             toast.add({

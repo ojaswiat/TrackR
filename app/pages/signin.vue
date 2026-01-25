@@ -9,9 +9,13 @@
                 color="neutral"
                 class="flex justify-center cursor-pointer"
                 variant="outline"
+                :loading="isDemoLoading"
                 @click="signInDemoUser">
                 Sign in as Demo User
             </UButton>
+            <p class="text-muted text-xs">
+                Demo account has read-only access
+            </p>
         </div>
 
         <div class="flex flex-col gap-4 items-center">
@@ -23,6 +27,7 @@
                 color="neutral"
                 class="flex justify-center cursor-pointer"
                 variant="outline"
+                :disabled="isDemoLoading"
                 @click="signInWithGitHub">
                 Sign in with GitHub
             </UButton>
@@ -31,6 +36,7 @@
                 color="neutral"
                 class="flex justify-center cursor-pointer"
                 variant="outline"
+                :disabled="isDemoLoading"
                 @click="signInWithGoogle">
                 Sign in with Google
             </UButton>
@@ -56,6 +62,11 @@
 <script setup lang="ts">
 const supabase = useSupabaseClient();
 const user = useSupabaseUser();
+const toast = useToast();
+
+const isDemoLoading = ref(false);
+
+const runtimeConfig = useRuntimeConfig();
 
 async function signInWithGitHub() {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -67,6 +78,11 @@ async function signInWithGitHub() {
 
     if (error) {
         console.error("Error signing in:", error);
+        toast.add({
+            title: "Sign in failed",
+            description: error.message,
+            color: "error",
+        });
     }
 }
 
@@ -80,14 +96,55 @@ async function signInWithGoogle() {
 
     if (error) {
         console.error("Error signing in:", error);
+        toast.add({
+            title: "Sign in failed",
+            description: error.message,
+            color: "error",
+        });
     }
 }
 
-async function signInDemoUser() {}
+async function signInDemoUser() {
+    isDemoLoading.value = true;
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: runtimeConfig.demoUserEmail,
+            password: runtimeConfig.demoUserPassword,
+        });
+
+        if (error) {
+            console.error("Error signing in as demo:", error);
+            toast.add({
+                title: "Demo sign in failed",
+                description: "Unable to sign in to demo account. Please try again.",
+                color: "error",
+            });
+            return;
+        }
+
+        if (data.user) {
+            toast.add({
+                title: "Welcome to Demo Mode!",
+                description: "You are viewing a read-only demo account.",
+                color: "success",
+                icon: "i-lucide-info",
+            });
+        }
+    } catch (err) {
+        console.error("Unexpected error:", err);
+        toast.add({
+            title: "Error",
+            description: "An unexpected error occurred.",
+            color: "error",
+        });
+    } finally {
+        isDemoLoading.value = false;
+    }
+}
 
 watch(user, async () => {
     if (user.value) {
-        // Redirect to /dashboard instead of default '/'
         navigateTo(ROUTE_DASHBOARD);
     }
 }, { immediate: true });

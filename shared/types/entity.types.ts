@@ -6,6 +6,7 @@ export type TUser = {
     last_name: string;
     email: string;
     currency: string;
+    is_demo?: boolean | null;
 };
 
 export type TAccount = {

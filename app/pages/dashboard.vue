@@ -15,7 +15,7 @@
         />
         <DashboardAccounts
             v-model:selected-account="selectedAccount"
-            class="mx-4"
+            class="px-4"
             :accounts="accounts"
         />
 

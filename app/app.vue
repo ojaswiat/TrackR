@@ -10,6 +10,7 @@
 
 <script setup>
 import { Analytics } from "@vercel/analytics/nuxt";
+import useUserStore from "~/stores/UserStore";
 
 useHead({
     meta: [
@@ -33,5 +34,11 @@ useSeoMeta({
     ogImage: "https://ui.nuxt.com/assets/templates/nuxt/starter-light.png",
     twitterImage: "https://ui.nuxt.com/assets/templates/nuxt/starter-light.png",
     twitterCard: "summary_large_image",
+});
+
+const userStore = useUserStore();
+
+onMounted(() => {
+    userStore.fetchUser();
 });
 </script>

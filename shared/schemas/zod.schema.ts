@@ -65,7 +65,7 @@ export const ZUserProfileSchema = z.object({
     currency: z.string().default(APP_CONFIG.DEFAULT_CURRENCY).optional(),
 });
 
-export type TUserProfile = z.infer<typeof ZUserProfileSchema>;
+export type TUserProfile = z.infer<typeof ZUserProfileSchema> & { is_demo?: boolean | null };
 
 export const ZDashboardFilterSchema = z.object({
     startDate: z.string().optional().refine((date) => !date || !Number.isNaN(Date.parse(date)), {
