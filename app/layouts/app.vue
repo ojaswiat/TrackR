@@ -1,9 +1,12 @@
 <template>
     <div class="w-screen">
-        <UIDemoBanner v-if="!!user.is_demo" />
+        <UIDemoBanner
+            v-if="!!user.is_demo"
+            class="fixed top-0 w-full z-9999"
+        />
         <div class="w-full flex">
             <UISideNav
-                class="shrink-0 w-64 pt-8 sticky top-0 left-0 z-9999"
+                class="shrink-0 w-64 pt-8 sticky top-0 left-0 z-40"
                 :open="true"
                 @on-add-transaction="showAddTransactionModal = true"
             />
