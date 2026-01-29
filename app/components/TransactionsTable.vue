@@ -148,6 +148,10 @@ const columns: TableColumn<TTransactionUI>[] = [
         },
     },
     {
+        accessorKey: "description",
+        header: "Description",
+    },
+    {
         accessorKey: "amount",
         header: "Amount",
         meta: {

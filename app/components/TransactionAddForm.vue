@@ -53,7 +53,7 @@
             <UFormField
                 class="flex flex-col gap-1"
                 label="Account"
-                name="account"
+                name="account_id"
                 required>
                 <USelect
                     v-model="state.account_id"
@@ -62,7 +62,7 @@
                     placeholder="Select an account">
                     <template #item-leading="{ item }">
                         <div
-                            class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                            class="h-2 w-2 rounded-full mt-1.5 mr-2"
                             :style="{ backgroundColor: item.color }">
                         </div>
                     </template>
@@ -72,7 +72,7 @@
             <UFormField
                 class="flex flex-col gap-1"
                 label="Category"
-                name="category"
+                name="category_id"
                 required>
                 <USelect
                     v-model="state.category_id"
@@ -82,7 +82,7 @@
                     placeholder="Select a category">
                     <template #item-leading="{ item }">
                         <div
-                            class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                            class="h-2 w-2 rounded-full mt-1.5 mr-2"
                             :style="{ backgroundColor: item.color }">
                         </div>
                     </template>
@@ -202,9 +202,9 @@ const inputDate = useTemplateRef("inputDate");
 
 const initialState = {
     type: props.transaction?.type ?? 1,
-    date: props.transaction?.created_at ?? today(getLocalTimeZone()).toString(),
-    category_id: props.transaction?.category_id ?? "",
-    account_id: props.transaction?.account_id ?? "",
+    transaction_date: props.transaction?.transaction_date ?? today(getLocalTimeZone()).toString(),
+    category_id: props.transaction?.category_id ?? undefined,
+    account_id: props.transaction?.account_id ?? undefined,
     amount: props.transaction?.amount ?? 0.00,
     description: props.transaction?.description ?? "",
 };
@@ -213,10 +213,10 @@ const state = reactive(cloneDeep(initialState));
 
 const dateProxy = computed({
     get: () => {
-        if (!state.date) {
+        if (!state.transaction_date) {
             return today(getLocalTimeZone());
         } else {
-            const date = new Date(state.date);
+            const date = new Date(state.transaction_date);
             return new CalendarDate(date.getFullYear(), date.getMonth(), date.getDate());
         }
     },
@@ -224,12 +224,12 @@ const dateProxy = computed({
         if (!value) {
             const thisDay = today(getLocalTimeZone());
             const thisDate = new Date(thisDay.toString());
-            state.date = thisDate.toISOString();
+            state.transaction_date = thisDate.toISOString();
             return;
         }
 
         const thisDate = new Date(value.toString());
-        state.date = thisDate.toISOString();
+        state.transaction_date = thisDate.toISOString();
     },
 });
 

@@ -1,4 +1,4 @@
-1. Read the demo user keys from the .env variables
+1. Any API call needs to update the UI. Try to do optimistic updates if possible.
 2. Make the UI responsive.
     1. Make FAB for phone
     2. Make the pages responsive
