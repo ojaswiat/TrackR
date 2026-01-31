@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         const { id: userId } = user;
 
         // Validate ID
-        const idSchema = z.uuidv4("Invalid transaction ID");
+        const idSchema = z.uuid("Invalid transaction ID");
         const idResult = idSchema.safeParse(transactionId);
 
         if (!idResult.success) {

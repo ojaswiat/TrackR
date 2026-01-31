@@ -5,7 +5,7 @@ import { PROTECTED_ROUTES, STATUS_CODE_MESSAGE_MAP } from "../constants/server.c
 
 export default defineEventHandler(async (event) => {
     // Only run auth check on protected routes
-    const url = event.node.req.url;
+    const url = event.path;
 
     // Skip auth check for public routes
     const isProtected = PROTECTED_ROUTES.some((route) => startsWith(url, route));

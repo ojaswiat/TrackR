@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         const id = getRouterParam(event, "id");
 
         // Validate ID
-        const idSchema = z.uuidv4("Invalid account ID");
+        const idSchema = z.uuid("Invalid account ID");
         const idResult = idSchema.safeParse(id);
         if (!idResult.success) {
             throw createError({

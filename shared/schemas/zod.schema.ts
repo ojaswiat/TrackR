@@ -32,10 +32,10 @@ export const ZAddTransactionSchema = z.object({
             return !Number.isNaN(date.getTime());
         }, { message: "Date must be a valid date" }),
     category_id: z
-        .uuidv4()
+        .uuid()
         .optional(),
     account_id: z
-        .uuidv4()
+        .uuid()
         .min(1, { message: "Account is required" }),
     amount: z.number().min(0.01, { message: "Amount must be greater than 0.00" }),
     description: z
