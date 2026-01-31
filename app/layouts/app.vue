@@ -35,6 +35,7 @@
 </template>
 
 <script setup lang="ts">
+import useCategoryStore from "~/stores/CategoryStore";
 import useUserStore from "~/stores/UserStore";
 
 useHead({
@@ -46,10 +47,12 @@ useHead({
 const showAddTransactionModal = ref(false);
 
 const userStore = useUserStore();
+const categoryStore = useCategoryStore();
 const { user } = storeToRefs(userStore);
 
-onMounted(() => {
-    userStore.fetchUser();
+onMounted(async () => {
+    await userStore.fetchUser();
+    await categoryStore.fetchCategories();
 });
 </script>
 

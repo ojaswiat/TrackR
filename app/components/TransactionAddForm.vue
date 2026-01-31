@@ -161,10 +161,11 @@ import type { z } from "zod";
 import { CalendarDate, getLocalTimeZone, today } from "@internationalized/date";
 import { cloneDeep, filter, map } from "lodash-es";
 import { storeToRefs } from "pinia";
-import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
+import { ACCOUNTS_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
 import { CATEGORY_TYPE, TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { ZAddTransactionSchema } from "~~/shared/schemas/zod.schema";
 import useTransactionActions from "~/composables/useTransactionActions";
+import useCategoryStore from "~/stores/CategoryStore";
 import useUserStore from "~/stores/UserStore";
 
 const props = defineProps({
@@ -174,17 +175,26 @@ const props = defineProps({
     },
 });
 
-const { data: categoriesResponse } = await useFetch(CATEGORIES_FETCH);
 const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
 
 const userStore = useUserStore();
 const { user } = storeToRefs(userStore);
 
+const categoryStore = useCategoryStore();
+const { expenseCategories, incomeCategory } = storeToRefs(categoryStore);
+
 const { applyOptimisticAdd, applyOptimisticUpdate, triggerTransactionRefresh } = useTransactionActions();
 
-const categories = computed(() => {
-    return categoriesResponse.value?.data?.categories || [];
-});
+const initialState = {
+    type: props.transaction?.type ?? 1,
+    transaction_date: props.transaction?.transaction_date ?? today(getLocalTimeZone()).toString(),
+    category_id: props.transaction?.category_id ?? undefined,
+    account_id: props.transaction?.account_id ?? undefined,
+    amount: props.transaction?.amount ?? 0.00,
+    description: props.transaction?.description ?? "",
+};
+
+const state = reactive(cloneDeep(initialState));
 
 const accounts = computed(() => {
     return (accountsResponse.value as TAPIResponseSuccess<{ accounts: TAccount[] }>)?.data?.accounts || [];
@@ -202,17 +212,6 @@ const saving = ref(false);
 const open = defineModel<boolean>("open", { default: false });
 
 const inputDate = useTemplateRef("inputDate");
-
-const initialState = {
-    type: props.transaction?.type ?? 1,
-    transaction_date: props.transaction?.transaction_date ?? today(getLocalTimeZone()).toString(),
-    category_id: props.transaction?.category_id ?? undefined,
-    account_id: props.transaction?.account_id ?? undefined,
-    amount: props.transaction?.amount ?? 0.00,
-    description: props.transaction?.description ?? "",
-};
-
-const state = reactive(cloneDeep(initialState));
 
 const dateProxy = computed({
     get: () => {
@@ -252,9 +251,7 @@ const accountOptions = computed(() => {
 });
 
 const categoryOptions = computed(() => {
-    const noIncomeCategory = filter(categories.value, (category) => category.type !== CATEGORY_TYPE.INCOME);
-
-    const items = map(noIncomeCategory, (category) => {
+    const items = map(expenseCategories.value, (category) => {
         return {
             label: category.name,
             value: category.id,
@@ -277,19 +274,19 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         const requestBody = {
             ...event.data,
             category_id: event.data.type === TRANSACTION_TYPE.INCOME
-                ? undefined
+                ? incomeCategory.value?.id
                 : event.data.category_id,
         };
 
         if (props.transaction?.id) {
             // Update transaction - optimistic update
-            const optimisticTransaction: TTransaction = {
+            const optimisticTransaction = {
                 ...props.transaction,
                 ...requestBody,
             };
 
             // Apply optimistic update to UI
-            applyOptimisticUpdate(optimisticTransaction);
+            applyOptimisticUpdate(optimisticTransaction as TTransaction);
 
             try {
                 // Call API to persist
@@ -314,6 +311,11 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
             });
 
             const newTransaction = response.data.transaction;
+
+            // For income transactions, set category from store
+            if (newTransaction.type === TRANSACTION_TYPE.INCOME && incomeCategory.value) {
+                newTransaction.category_id = incomeCategory.value.id;
+            }
 
             // Apply optimistic add to UI with the actual response
             applyOptimisticAdd(newTransaction);

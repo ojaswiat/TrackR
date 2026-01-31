@@ -25,7 +25,7 @@
             :disabled="selectedType === TRANSACTION_TYPE.INCOME">
             <template #item-leading="{ item }">
                 <div
-                    class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                    class="h-2 w-2 rounded-full mt-1.5 mr-2"
                     :style="{ backgroundColor: item.color }">
                 </div>
             </template>
@@ -37,7 +37,7 @@
             placeholder="Select an account">
             <template #item-leading="{ item }">
                 <div
-                    class="h-2 w-2 rounded-full mt-[6px] mr-2"
+                    class="h-2 w-2 rounded-full mt-1.5 mr-2"
                     :style="{ backgroundColor: item.color }">
                 </div>
             </template>

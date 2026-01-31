@@ -7,7 +7,7 @@
             v-model:selected-category="selectedCategory"
             class="px-4"
             :accounts="accounts"
-            :categories="categories"
+            :categories="expenseCategories"
             :loading="status === 'pending'"
             @refresh="() => refreshTransactions()"
         />
@@ -28,9 +28,10 @@
 import type { TTransactionType } from "~~/shared/constants/enums";
 import { getLocalTimeZone, today } from "@internationalized/date";
 import { find, map, reduce } from "lodash-es";
-import { ACCOUNTS_FETCH, CATEGORIES_FETCH, TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
+import { ACCOUNTS_FETCH, TRANSACTIONS_FETCH } from "~~/shared/constants/api.const";
 import { APP_CONFIG } from "~~/shared/constants/config.const";
 import useTransactionActions from "~/composables/useTransactionActions";
+import useCategoryStore from "~/stores/CategoryStore";
 
 definePageMeta({
     title: "Transactions",
@@ -54,7 +55,9 @@ const selectedDateRange = ref({
 });
 
 const { data: accountsResponse } = await useFetch(ACCOUNTS_FETCH);
-const { data: categoryResponse } = await useFetch(CATEGORIES_FETCH);
+
+const categoryStore = useCategoryStore();
+const { allCategories, expenseCategories } = storeToRefs(categoryStore);
 
 const cursor = ref<string | null>(null);
 const accumulatedTransactions = ref<TTransaction[]>([]);
@@ -84,9 +87,6 @@ const { data: transactionsResponse, status, execute: fetchMoreTransactions } = u
         watch: false, // Disable automatic watching
     },
 );
-const categories = computed(() => {
-    return categoryResponse.value?.data?.categories ?? [];
-});
 
 const accounts = computed(() => {
     return accountsResponse.value?.data?.accounts ?? [];
@@ -94,7 +94,7 @@ const accounts = computed(() => {
 
 const categoriesMap = computed<Record<string, TCategory>>(() => {
     return reduce(
-        categories.value,
+        allCategories.value,
         (accumulator, category) => {
             accumulator[category.id] = category;
             return accumulator;
@@ -122,9 +122,6 @@ const selectedAccountName = computed(() => {
 
 const { registerRefreshCallback, registerOptimisticCallbacks } = useTransactionActions();
 
-/**
- * Check if transaction matches current filters
- */
 function transactionMatchesFilters(transaction: TTransaction): boolean {
     // Check account filter
     if (selectedAccount.value && transaction.account_id !== selectedAccount.value) {
@@ -153,9 +150,6 @@ function transactionMatchesFilters(transaction: TTransaction): boolean {
     return true;
 }
 
-/**
- * Format transaction with category and account details
- */
 function formatTransaction(transaction: TTransaction): TTransactionUI {
     const transactionCategory = categoriesMap.value[transaction.category_id];
     const transactionAccount = accountsMap.value[transaction.account_id];
@@ -209,7 +203,7 @@ onMounted(() => {
         },
         onUpdate: (transaction) => {
             // Find and update the transaction in the list
-            const index = accumulatedTransactions.value.findIndex(t => t.id === transaction.id);
+            const index = accumulatedTransactions.value.findIndex((t) => t.id === transaction.id);
             if (index !== -1) {
                 // Check if it still matches filters after update
                 if (transactionMatchesFilters(transaction)) {
@@ -225,7 +219,7 @@ onMounted(() => {
         },
         onDelete: (transactionId) => {
             // Remove transaction from the list
-            const index = accumulatedTransactions.value.findIndex(t => t.id === transactionId);
+            const index = accumulatedTransactions.value.findIndex((t) => t.id === transactionId);
             if (index !== -1) {
                 accumulatedTransactions.value.splice(index, 1);
             }
