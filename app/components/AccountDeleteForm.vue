@@ -7,7 +7,7 @@
             <div class="flex items-center gap-4">
                 <UIcon
                     name="i-lucide:alert-triangle"
-                    class="w-8 h-8 text-error flex-shrink-0"
+                    class="w-8 h-8 text-error shrink-0"
                 />
                 <p>This will permanently delete the account <span class="text-error">{{ props.account?.name }}</span>{{ !state.keep_transactions ? " and all of its transactions" : "" }}. Are you sure you want to proceed?</p>
             </div>
@@ -17,7 +17,7 @@
                 class="flex items-center gap-2 flex-row-reverse justify-center">
                 <UCheckbox
                     v-model="state.keep_transactions"
-                    class="mb-[6px]"
+                    class="mb-1.5"
                 />
             </UFormField>
 
