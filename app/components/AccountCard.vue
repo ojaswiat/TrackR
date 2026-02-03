@@ -1,6 +1,6 @@
 <template>
     <UCard
-        class="w-60 flex-shrink-0 accounts-card-hover cursor-pointer border"
+        class="grow w-xs sm:w-sm shrink-0 accounts-card-hover cursor-pointer border"
         :style="{
             borderColor: props.account.color,
             background: `linear-gradient(to right, ${props.account.color}00, ${props.account.color}11)`,

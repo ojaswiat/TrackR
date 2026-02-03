@@ -19,7 +19,7 @@
             :accounts="accounts"
         />
 
-        <div class="grid grid-cols-2 gap-4 px-4">
+        <div class="grid md:grid-cols-2 gap-4 px-4">
             <CategoryExpenses :categories="categoryBreakdown" />
             <AccountSummary :accounts="accounts.slice(1)" />
         </div>

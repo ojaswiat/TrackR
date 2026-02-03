@@ -2,7 +2,6 @@
     <LineChart
         :data="chartData"
         :height="280"
-        y-label="Sales"
         :x-num-ticks="4"
         :y-num-ticks="4"
         :categories="categories"
