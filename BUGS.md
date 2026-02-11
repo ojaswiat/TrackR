@@ -1,2 +1,1 @@
-1. The initial balance should be added as income.
-2. The selector is not working for today's date.
+1. If I add the initial balance as a transaction, it may overlap the entire categories.

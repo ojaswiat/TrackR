@@ -161,7 +161,7 @@ import type { CalendarDate } from "@internationalized/date";
 import type { FormSubmitEvent } from "@nuxt/ui";
 import type { z } from "zod";
 import { getLocalTimeZone, parseDate, today } from "@internationalized/date";
-import { cloneDeep, filter, map } from "lodash-es";
+import { cloneDeep, map } from "lodash-es";
 import { storeToRefs } from "pinia";
 import { ACCOUNTS_FETCH, TRANSACTIONS_ADD, TRANSACTIONS_UPDATE } from "~~/shared/constants/api.const";
 import { TRANSACTION_TYPE } from "~~/shared/constants/enums";
@@ -231,8 +231,6 @@ const dateProxy = computed({
             state.transaction_date = thisDate.toISOString();
             return;
         }
-
-        // Convert CalendarDate to ISO string maintaining the date
         const thisDate = value.toDate(getLocalTimeZone());
         state.transaction_date = thisDate.toISOString();
     },

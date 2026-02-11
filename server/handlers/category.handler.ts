@@ -28,6 +28,20 @@ export async function getIncomeCategory(): Promise<string> {
     }
 }
 
+export async function getOthersCategory(): Promise<string> {
+    const result = await db
+        .select({ id: categories.id })
+        .from(categories)
+        .where(eq(categories.name, "Others"))
+        .limit(1);
+
+    if (!result?.[0]?.id) {
+        throw new Error("No others category present!");
+    } else {
+        return result[0].id;
+    }
+}
+
 export async function getAllCategories(): Promise<TCategory[]> {
     const result = await db.select().from(categories);
     return result as TCategory[];

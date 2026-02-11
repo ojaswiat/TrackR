@@ -59,11 +59,10 @@
                     :disabled="edit && !!props.account?.id"
                     type="number"
                     step="0.01"
-                    min="0"
                     placeholder="0.00"
                 />
                 <template #hint>
-                    This will be counted towards income
+                    This will create an initial transaction
                 </template>
             </UFormField>
 

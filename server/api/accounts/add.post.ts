@@ -1,9 +1,13 @@
-import type { TUser } from "~~/shared/types/entity.types";
+import type { TTransaction, TUser } from "~~/shared/types/entity.types";
+import { getLocalTimeZone, today } from "@internationalized/date";
+import { isEmpty } from "lodash-es";
 import { STATUS_CODE_MESSAGE_MAP } from "~~/server/constants/server.const";
 import { addAccountForUser, checkCanUserAddAccount } from "~~/server/handlers/account.handler";
+import { getIncomeCategory, getOthersCategory } from "~~/server/handlers/category.handler";
+import { addTransactionForUser } from "~~/server/handlers/transaction.handler";
 import { isDev } from "~~/server/utils/api.utils";
 import { APP_CONFIG } from "~~/shared/constants/config.const";
-import { SERVER_STATUS_CODES } from "~~/shared/constants/enums";
+import { SERVER_STATUS_CODES, TRANSACTION_TYPE } from "~~/shared/constants/enums";
 import { ZAddAccountSchema } from "~~/shared/schemas/zod.schema";
 
 export default defineEventHandler(async (event) => {
@@ -33,7 +37,26 @@ export default defineEventHandler(async (event) => {
             });
         }
 
+        const newAccountInitialBalance = result.data.initial_balance ?? 0;
         const newAccount = await addAccountForUser(user.id, result.data);
+
+        let transaction = {} as TTransaction;
+
+        if (!isEmpty(newAccount)) {
+            const thisDay = today(getLocalTimeZone());
+            const thisDate = new Date(thisDay.toString());
+
+            if (newAccount.initial_balance !== 0) {
+                transaction = await addTransactionForUser(user.id, {
+                    account_id: newAccount.id,
+                    category_id: newAccountInitialBalance < 0 ? await getOthersCategory() : await getIncomeCategory(),
+                    type: newAccountInitialBalance < 0 ? TRANSACTION_TYPE.EXPENSE : TRANSACTION_TYPE.INCOME,
+                    amount: Math.abs(newAccountInitialBalance),
+                    description: "Initial balance",
+                    transaction_date: thisDate.toISOString(),
+                });
+            }
+        }
 
         return {
             statusCode: SERVER_STATUS_CODES.CREATED,
@@ -41,6 +64,7 @@ export default defineEventHandler(async (event) => {
             message: "Account created successfully!",
             data: {
                 account: newAccount,
+                transaction,
             },
         };
     } catch (error) {

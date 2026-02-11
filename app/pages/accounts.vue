@@ -121,8 +121,8 @@ const summary = computed(() => {
         total_expense: 0,
     };
 
-    data.total_income = (selectedAccountItem.value?.total_income ?? 0) + (selectedAccountItem.value?.initial_balance ?? 0);
-    data.total_expense = selectedAccountItem.value?.total_expense || 0;
+    data.total_income = selectedAccountItem.value?.total_income ?? 0;
+    data.total_expense = selectedAccountItem.value?.total_expense ?? 0;
 
     return data;
 });
